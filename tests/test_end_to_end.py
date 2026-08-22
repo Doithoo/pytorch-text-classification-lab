@@ -1,6 +1,10 @@
+import copy
 import csv
 from pathlib import Path
 
+import pytest
+
+from text_classifier.cli import main
 from text_classifier.config import load_config
 from text_classifier.data.manifest import prepare_data
 from text_classifier.training.train import train
@@ -40,3 +44,55 @@ def test_cpu_dry_run(tmp_path: Path) -> None:
     assert run_dir is not None
     assert (run_dir / "best.pt").exists()
     assert (run_dir / "metrics.csv").exists()
+
+    incompatible = copy.deepcopy(config)
+    incompatible["train"]["epochs"] = 2
+    incompatible["train"]["lr"] = 0.5
+    with pytest.raises(ValueError, match="train.lr"):
+        train(incompatible, resume=str(run_dir / "last.pt"))
+
+    config["train"]["epochs"] = 2
+    resumed_dir = train(config, resume=str(run_dir / "last.pt"))
+    assert resumed_dir == run_dir
+    assert len((run_dir / "metrics.csv").read_text(encoding="utf-8").splitlines()) == 3
+
+    checkpoint = run_dir / "best.pt"
+    main(
+        [
+            "evaluate",
+            "--checkpoint",
+            str(checkpoint),
+            "--manifest-dir",
+            str(manifests),
+            "--device",
+            "cpu",
+        ]
+    )
+    evaluation_dir = run_dir / "evaluation" / "test"
+    assert (evaluation_dir / "metrics.json").exists()
+    assert (evaluation_dir / "errors.jsonl").exists()
+    with pytest.raises(SystemExit, match="2"):
+        main(
+            [
+                "evaluate",
+                "--checkpoint",
+                str(checkpoint),
+                "--manifest-dir",
+                str(manifests),
+                "--device",
+                "cpu",
+            ]
+        )
+    main(
+        [
+            "evaluate",
+            "--checkpoint",
+            str(checkpoint),
+            "--manifest-dir",
+            str(manifests),
+            "--device",
+            "cpu",
+            "--overwrite",
+        ]
+    )
+    main(["predict", "--checkpoint", str(checkpoint), "--text", "hello", "--top-k", "2"])

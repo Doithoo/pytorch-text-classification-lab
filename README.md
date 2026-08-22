@@ -1,66 +1,92 @@
 # PyTorch Text Classification Lab
 
-A beginner-oriented, reproducible PyTorch project for learning text classification on Kaggle GPU.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
+[![CI](https://github.com/Doithoo/pytorch-text-classification-lab/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
 
-The first reference task is AG News, with a complete path from raw CSV files to token IDs, padded batches,
-training, evaluation, error analysis, and a checkpoint that can be resumed. The primary training environment is
-Kaggle with a T4 GPU. Local CPU execution is kept for tests and short dry runs.
+**中文: [README.zh-CN.md](README.zh-CN.md)**
 
-## Kaggle first
+A beginner-oriented PyTorch project that makes text-classification experiments reproducible. AG News is the fixed task used to explain download, stratified manifests, a training-only vocabulary, dynamic padding, classic models, GPU training, evaluation, error analysis, and checkpoint resume.
 
-The recommended path is documented in [the Kaggle guide](docs/guides/kaggle.zh-CN.md). The short version is:
-
-```bash
-kaggle auth login
-kaggle kernels push -p docs/recorded-run/kaggle
-kaggle kernels status <your-user>/pytorch-text-classification-lab-ag-news-gpu
-kaggle kernels output <your-user>/pytorch-text-classification-lab-ag-news-gpu --file-pattern 'artifacts/.*' -p kaggle-output
+```text
+download -> prepare -> inspect -> dry run -> train -> evaluate -> predict
 ```
 
-The runner enables Internet, downloads AG News into the writable `/kaggle/working` volume, prepares fixed
-manifests, runs a dry run, trains on CUDA, evaluates the test split, and leaves all evidence under `artifacts/`.
+The built-in models are `embedding_bag`, `text_cnn`, and `bilstm`. The current scope deliberately excludes arbitrary datasets, pretrained Transformers, and production serving.
 
-## Local development
+## Recorded Kaggle result
+
+The published TextCNN run trained for eight epochs on a Kaggle Tesla T4. The test split was evaluated once with the checkpoint selected on validation macro-F1.
+
+| Item | Result |
+| --- | ---: |
+| Train / valid / test | 108,000 / 12,000 / 7,600 |
+| Best validation macro-F1 | **0.915909** |
+| Test accuracy | **0.914605** |
+| Test macro-F1 | **0.914610** |
+| Kaggle wall clock | 151.3 seconds |
+
+![AG News TextCNN training curves](docs/assets/ag-news-textcnn-training.png)
+
+![AG News TextCNN test confusion matrix](docs/assets/ag-news-textcnn-confusion.png)
+
+This is a bounded recorded run, not a general benchmark. Its config, tokenizer, epoch metrics, environment, confusion matrix, and 649 errors are in the [recorded-run page](docs/recorded-run/kaggle-agnews-textcnn/README.md).
+
+## Start from a fresh clone
+
+Python 3.10-3.12 and [uv](https://docs.astral.sh/uv/) are required. Run from the repository root:
+
+```bash
+git clone https://github.com/Doithoo/pytorch-text-classification-lab.git
+cd pytorch-text-classification-lab
+uv sync --locked --extra dev
+uv run python scripts/download_data.py --data-dir data/raw
+uv run text-classify prepare-data --config configs/learning_minimal.yaml
+uv run text-classify inspect-data --config configs/learning_minimal.yaml
+uv run text-classify train --config configs/learning_minimal.yaml --dry-run --set device=cpu
+```
+
+The dry run performs one forward, loss, and backward pass without creating artifacts. Continue with a small CPU run:
+
+```bash
+uv run text-classify train --config configs/learning_minimal.yaml \
+  --set device=cpu --set run_name=first-run
+uv run text-classify evaluate --checkpoint artifacts/first-run/best.pt \
+  --manifest-dir data/manifests --device cpu
+uv run text-classify predict --checkpoint artifacts/first-run/best.pt \
+  --text "Stocks rose after the company reported strong earnings." --top-k 3
+```
+
+A normal run stores the resolved config, tokenizer, `best.pt`, `last.pt`, epoch metrics, and run identity. PyTorch checkpoints use Python pickle internally; load only files you trust.
+
+## Kaggle training
+
+Local CUDA is optional. Authenticate the Kaggle CLI and follow the [Kaggle guide](docs/guides/kaggle.md) before submitting:
+
+```bash
+uv tool install kaggle
+kaggle auth login
+kaggle kernels push -p docs/recorded-run/kaggle
+```
+
+The runner downloads the repository and AG News, prepares manifests, performs a dry run, trains on CUDA, and evaluates the test split. Download `artifacts/` after completion because Kaggle working storage is temporary.
+
+## Documentation
+
+Use the [documentation index](docs/README.md) to choose a path:
+
+- [Tutorial](docs/tutorial/README.md): basics, environment, data, models, training, evaluation, and inference.
+- [Concepts](docs/concepts/classification-flow.md): data flow, code tour, and configuration flow.
+- [Guides](docs/guides/choosing-models.md): model choice, experiments, troubleshooting, Kaggle, and extension points.
+- [Reference](docs/reference/config-reference.md): config, data, metrics, checkpoints, CLI, and model catalog.
+- [Directory guides](configs/README.md): runnable configs, examples, scripts, and tests.
+
+See the [dataset note](docs/reference/ag-news.md) for AG News provenance, citation, and licensing boundaries.
+
+## Development
 
 ```bash
 uv sync --locked --extra dev
-uv run text-classify show-config --config configs/learning_minimal.yaml
-uv run pytest
-uv run text-classify train --config configs/learning_minimal.yaml --dry-run
-```
-
-Local data preparation is also supported when `data/raw/ag_news_csv/{train,test}.csv` is present:
-
-```bash
-uv run python scripts/download_data.py --data-dir data/raw
-uv run text-classify prepare-data --data-dir data/raw --manifest-dir data/manifests
-```
-
-## Learning route
-
-1. `examples/01_tokens.py`: Unicode text and the vocabulary.
-2. `examples/02_padding_and_mask.py`: variable-length batches and attention masks.
-3. `examples/03_minimal_training_loop.py`: logits, loss, and one optimizer step.
-4. `docs/tutorial/`: the complete data, model, training, and evaluation route.
-5. Compare `embedding_bag`, `text_cnn`, and `bilstm` using the same manifest and seed.
-
-## Project structure
-
-```text
-configs/                  Small and reference experiment configurations
-scripts/                  Data download and inspection utilities
-docs/                     Tutorials, Kaggle workflow, and recorded evidence
-examples/                 Small executable learning programs
-src/text_classifier/      Installed application and reusable code
-tests/                    Unit, integration, and CLI tests
-```
-
-The raw dataset is not committed. Check its source and license terms before redistribution. Training only builds
-the vocabulary from the training split, and every run records the manifest and tokenizer identities.
-
-## Development checks
-
-```bash
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy
@@ -69,4 +95,4 @@ uv build
 uv run twine check dist/*
 ```
 
-MIT License.
+Behavior changes require tests, and English/Chinese documentation should remain semantically aligned. Read [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and the [changelog](CHANGELOG.md) before contributing. Source code is available under the [MIT License](LICENSE).

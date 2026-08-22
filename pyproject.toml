@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytorch-text-classification-lab"
-version = "0.1.0"
+version = "0.2.0"
 description = "A reproducible, beginner-oriented PyTorch text classification lab"
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
@@ -35,16 +35,15 @@ dev = [
     "types-PyYAML>=6,<7",
     "build>=1.2,<2",
     "twine>=5,<7",
+    "pre-commit>=3.7,<5",
 ]
 plot = ["matplotlib>=3.6,<4"]
-transformers = [
-    "transformers>=4.40,<5",
-    "safetensors>=0.4,<1",
-]
 
 [project.urls]
 Homepage = "https://github.com/Doithoo/pytorch-text-classification-lab"
+Documentation = "https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/docs"
 Repository = "https://github.com/Doithoo/pytorch-text-classification-lab"
+Issues = "https://github.com/Doithoo/pytorch-text-classification-lab/issues"
 
 [project.scripts]
 text-classify = "text_classifier.cli:main"

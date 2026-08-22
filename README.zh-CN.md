@@ -1,81 +1,92 @@
 # PyTorch 文本分类实践
 
-这是一个以 Kaggle GPU 为主线的 PyTorch 文本分类学习项目。第一版使用 AG News，完整覆盖：
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
+[![CI](https://github.com/Doithoo/pytorch-text-classification-lab/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
+
+**English: [README.md](README.md)**
+
+这是一个面向初学者、强调实验可复现性的 PyTorch 文本分类项目。项目以 AG News 为固定任务，完整展示数据下载、分层划分、训练集词表、动态 padding、经典模型、GPU 训练、评估、错误分析和 checkpoint 续训。
 
 ```text
-下载数据 -> 生成固定 manifest -> 检查文本和长度 -> tokenizer -> padding batch -> dry run -> GPU 训练 -> 评估 -> 错误分析
+download -> prepare -> inspect -> dry run -> train -> evaluate -> predict
 ```
 
-项目不要求本地 CUDA。Kaggle 负责主要训练环境，本地只用于阅读代码、运行测试和 CPU 小规模验证。
+当前内置 `embedding_bag`、`text_cnn` 和 `bilstm`。项目有意先讲清经典文本分类的数据与训练契约；目前不支持任意数据集、预训练 Transformer 或生产部署。
 
-## Kaggle 快速开始
+## 已完成的 Kaggle 训练
 
-先安装 Kaggle CLI 并完成登录：
+项目已在 Kaggle Tesla T4 上完成 TextCNN 的 8 轮 AG News 训练，并使用最佳验证轮次一次性评估测试集。
+
+| 项目 | 结果 |
+| --- | ---: |
+| 训练 / 验证 / 测试 | 108,000 / 12,000 / 7,600 |
+| 最佳验证 macro-F1 | **0.915909** |
+| 测试 accuracy | **0.914605** |
+| 测试 macro-F1 | **0.914610** |
+| Kaggle 总耗时 | 151.3 秒 |
+
+![AG News TextCNN 训练曲线](docs/assets/ag-news-textcnn-training.png)
+
+![AG News TextCNN 测试集混淆矩阵](docs/assets/ag-news-textcnn-confusion.png)
+
+这是一组有明确数据、配置和环境边界的真实运行记录，不是通用基准。配置、tokenizer、逐轮指标、环境、混淆矩阵和 649 个错误样本见[参考运行](docs/recorded-run/kaggle-agnews-textcnn/README.zh-CN.md)。
+
+## 从全新克隆开始
+
+需要 Python 3.10-3.12 和 [uv](https://docs.astral.sh/uv/)。以下命令从仓库根目录执行：
+
+```bash
+git clone https://github.com/Doithoo/pytorch-text-classification-lab.git
+cd pytorch-text-classification-lab
+uv sync --locked --extra dev
+uv run python scripts/download_data.py --data-dir data/raw
+uv run text-classify prepare-data --config configs/learning_minimal.yaml
+uv run text-classify inspect-data --config configs/learning_minimal.yaml
+uv run text-classify train --config configs/learning_minimal.yaml --dry-run --set device=cpu
+```
+
+`--dry-run` 只完成一个 batch 的前向、损失和反向传播，不创建运行目录。继续完成一次小样本 CPU 训练与评估：
+
+```bash
+uv run text-classify train --config configs/learning_minimal.yaml \
+  --set device=cpu --set run_name=first-run
+uv run text-classify evaluate --checkpoint artifacts/first-run/best.pt \
+  --manifest-dir data/manifests --device cpu
+uv run text-classify predict --checkpoint artifacts/first-run/best.pt \
+  --text "Stocks rose after the company reported strong earnings." --top-k 3
+```
+
+正常训练会保存最终配置、tokenizer、`best.pt`、`last.pt`、逐轮指标和运行身份。checkpoint 基于 Python pickle，只加载你信任的文件。
+
+## 在 Kaggle 训练
+
+不要求本地 CUDA。安装并登录 Kaggle CLI 后，按[Kaggle 训练指南](docs/guides/kaggle.zh-CN.md)修改 Kernel 用户名并提交：
 
 ```bash
 uv tool install kaggle
 kaggle auth login
-```
-
-然后阅读 [Kaggle 训练指南](docs/guides/kaggle.zh-CN.md)，修改其中的 GitHub 仓库地址和 Kaggle 用户名，提交：
-
-```bash
 kaggle kernels push -p docs/recorded-run/kaggle
-kaggle kernels status <你的用户名>/pytorch-text-classification-lab-ag-news-gpu
 ```
 
-训练结束后下载产物：
+runner 会自动下载代码和 AG News、准备 manifest、dry run、CUDA 训练并评估测试集。Kaggle 临时磁盘会清理，运行完成后必须下载 `artifacts/`。
 
-```bash
-kaggle kernels output <你的用户名>/pytorch-text-classification-lab-ag-news-gpu \
-  --file-pattern 'artifacts/.*' -p kaggle-output
-```
+## 文档
 
-Kaggle runner 会自动完成数据下载、manifest 生成、dry run、GPU 训练和测试集评估。Kaggle 的临时磁盘会在会话结束后清理，因此必须下载 `artifacts/`。
+从[文档首页](docs/README.zh-CN.md)按目标进入：
 
-## 本地最短检查
+- [教程](docs/tutorial/README.zh-CN.md)：基础、环境、数据、模型、训练、评估与推理。
+- [概念](docs/concepts/classification-flow.zh-CN.md)：完整数据流、代码导览和配置合并。
+- [指南](docs/guides/choosing-models.zh-CN.md)：模型选择、实验、排错、Kaggle 和扩展方式。
+- [参考](docs/reference/config-reference.zh-CN.md)：配置、数据格式、指标、checkpoint、CLI 和模型清单。
+- [目录说明](configs/README.zh-CN.md)：配置、示例、脚本和测试的可运行入口。
 
-```bash
-uv sync --locked --extra dev
-uv run text-classify show-config --config configs/learning_minimal.yaml
-uv run text-classify train --config configs/learning_minimal.yaml --dry-run
-uv run pytest
-```
-
-本地完整数据训练不是主线。需要本地准备数据时：
-
-```bash
-uv run python scripts/download_data.py --data-dir data/raw
-uv run text-classify prepare-data --data-dir data/raw --manifest-dir data/manifests
-```
-
-## 学习路线
-
-- `examples/01_tokens.py`：文本、token 和词表。
-- `examples/02_padding_and_mask.py`：变长序列、padding 和 mask。
-- `examples/03_minimal_training_loop.py`：logits、loss、反向传播和参数更新。
-- `configs/learning_minimal.yaml`：CPU 可运行的最小配置。
-- `configs/reference_textcnn.yaml`：Kaggle T4 参考训练配置。
-- `configs/reference_bilstm.yaml`：序列模型对照配置。
-
-第一版模型包括 `embedding_bag`、`text_cnn` 和 `bilstm`。Transformer 和预训练模型放在后续阶段，先保证基础数据流和评估协议清晰。
-
-## 目录
-
-```text
-configs/                  配置文件
-scripts/                  数据下载和检查脚本
-docs/                     教程、Kaggle 流程和参考运行
-examples/                 可单独运行的学习示例
-src/text_classifier/      可安装的应用代码
-tests/                    单元、集成和 CLI 测试
-```
-
-原始数据不提交到仓库。发布结果时请同时记录数据来源、许可证、manifest hash、词表 hash、配置、依赖和 Kaggle GPU 环境。
+AG News 的来源、引用和数据许可边界见[数据集说明](docs/reference/ag-news.zh-CN.md)。
 
 ## 开发
 
 ```bash
+uv sync --locked --extra dev
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy
@@ -84,4 +95,4 @@ uv build
 uv run twine check dist/*
 ```
 
-项目采用 MIT License。
+行为修改必须带测试，双语文档应保持语义一致。贡献前请阅读[贡献指南](CONTRIBUTING.zh-CN.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。项目代码采用 [MIT License](LICENSE)。

@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this educational project, cite the repository and the AG News source paper."
+title: "PyTorch Text Classification Lab"
+type: software
+authors:
+  - family-names: Yashowhoo
+repository-code: "https://github.com/Doithoo/pytorch-text-classification-lab"
+url: "https://github.com/Doithoo/pytorch-text-classification-lab"
+license: MIT
+version: 0.2.0
+date-released: 2026-08-22
+references:
+  - type: conference-paper
+    title: "Character-level Convolutional Networks for Text Classification"
+    authors:
+      - family-names: Zhang
+        given-names: Xiang
+      - family-names: Zhao
+        given-names: Junbo
+      - family-names: LeCun
+        given-names: Yann
+    year: 2015

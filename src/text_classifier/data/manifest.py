@@ -44,6 +44,8 @@ def _hash_file(path: Path) -> str:
 def prepare_data(
     data_dir: str | Path, manifest_dir: str | Path, valid_ratio: float = 0.1, seed: int = 42
 ) -> dict[str, Any]:
+    if not 0.0 < valid_ratio < 1.0:
+        raise ValueError("valid_ratio must be greater than 0 and less than 1")
     root = Path(data_dir) / "ag_news_csv"
     train_path, test_path = root / "train.csv", root / "test.csv"
     if not train_path.exists() or not test_path.exists():
@@ -100,5 +102,16 @@ def load_manifest(path: str | Path, limit: int | None = None) -> list[dict[str, 
 
 
 def manifest_identity(manifest_dir: str | Path) -> str:
-    metadata = json.loads((Path(manifest_dir) / "dataset.json").read_text(encoding="utf-8"))
+    metadata = load_manifest_metadata(manifest_dir)
     return hashlib.sha256(json.dumps(metadata, sort_keys=True).encode()).hexdigest()
+
+
+def load_manifest_metadata(manifest_dir: str | Path) -> dict[str, Any]:
+    path = Path(manifest_dir) / "dataset.json"
+    metadata = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(metadata, dict) or metadata.get("schema_version") != 1:
+        raise ValueError(f"unsupported dataset metadata in {path}")
+    labels = metadata.get("labels")
+    if not isinstance(labels, list) or not labels or not all(isinstance(label, str) for label in labels):
+        raise ValueError(f"dataset labels must be a non-empty string list in {path}")
+    return metadata

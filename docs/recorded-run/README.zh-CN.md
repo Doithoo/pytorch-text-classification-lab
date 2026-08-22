@@ -1,13 +1,15 @@
-# Kaggle 参考运行
+# 参考运行证据
 
-本目录保存可复现的 Kaggle runner 和 Kernel metadata，目前不声明参考指标。需要先将 GitHub 仓库发布并完成第一次 T4 训练，再把真实结果写入这里。
+[English](README.md) | [文档首页](../README.zh-CN.md)
 
-发布的参考运行应保留：
+本目录包含可复现 Kaggle runner、Kernel metadata 和已完成运行的机器可读证据。
 
-- 精确 Git revision 和最终配置；
-- 原始数据与 manifest 的 SHA-256 identity；
-- Kaggle GPU、PyTorch、CUDA 和 Python 版本；
-- `metrics.csv`、`best.pt`、`last.pt`、测试指标和高置信度错误样本；
-- 总运行时间和未修改的 `kaggle-run-summary.json`。
+当前已发布运行：
 
-第一次运行按 [Kaggle 训练指南](../guides/kaggle.zh-CN.md)操作。没有完成真实训练前，不应填写估算性能数字。
+| 运行 | 模型 | 测试 accuracy | 测试 macro-F1 | 页面 |
+| --- | --- | ---: | ---: | --- |
+| `kaggle-agnews-textcnn` | TextCNN | 0.914605 | 0.914610 | [详情](kaggle-agnews-textcnn/README.zh-CN.md) |
+
+运行目录保留精确 git revision、解析配置、源与 manifest identity、tokenizer、逐轮 metrics、Kaggle GPU/PyTorch/CUDA/Python、测试指标和高置信度错误。93 MB checkpoint 由 Kaggle 输出提供，不提交 Git。
+
+`kaggle/` 是可重新提交的 runner，不是一次运行结果。发布新结果时创建独立目录，不覆盖历史证据；不要把 dry run 或小样本结果描述为完整基准。

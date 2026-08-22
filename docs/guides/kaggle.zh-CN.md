@@ -1,88 +1,58 @@
 # Kaggle 训练指南
 
-本项目以 Kaggle GPU 作为主要训练环境。推荐使用 Kaggle T4，项目按单 GPU 设计，使用 `cuda:0`，不依赖多卡。
+[English](kaggle.md) | [文档首页](../README.zh-CN.md)
+
+项目的完整训练环境是单张 Kaggle Tesla T4。runner 使用 `cuda:0`，不依赖多卡。
 
 ## 准备
 
-先将仓库推送到 GitHub，并修改 `docs/recorded-run/kaggle/run_kaggle.py` 中的 `PROJECT_URL`。然后安装 Kaggle CLI：
+安装并认证 Kaggle CLI：
 
 ```bash
 uv tool install kaggle
 kaggle auth login
 ```
 
-修改 `docs/recorded-run/kaggle/kernel-metadata.json` 中的：
+打开 `docs/recorded-run/kaggle/kernel-metadata.json`，把 `id` 中的 `yashowhoo` 改成你的 Kaggle 用户名。保留 GPU、Internet 和 T4 设置。runner 会在线克隆公开仓库并下载 AG News，因此默认分支必须可访问；若使用 fork，同步修改 `run_kaggle.py` 的 `PROJECT_URL`。
 
-```json
-{
-  "id": "你的用户名/pytorch-text-classification-lab-ag-news-gpu",
-  "enable_gpu": "true",
-  "enable_internet": "true",
-  "machine_shape": "NvidiaTeslaT4"
-}
-```
-
-`enable_internet` 必须开启，因为 runner 会下载项目代码和 AG News。`dataset_sources` 保持为空，避免非交互 Kernel 运行时动态挂载数据集失败。
-
-## 提交
+## 提交和观察
 
 ```bash
 kaggle kernels push -p docs/recorded-run/kaggle
 kaggle kernels status <你的用户名>/pytorch-text-classification-lab-ag-news-gpu
 ```
 
-runner 执行顺序为：
+执行顺序是：
 
 ```text
-git clone -> pip install -> download AG News -> prepare manifest -> inspect -> dry run -> CUDA train -> test evaluate
+git clone -> install -> download -> prepare -> inspect -> dry run -> train -> evaluate
 ```
 
-提交前确认仓库默认分支和 `PROJECT_URL` 可被 Kaggle 访问。第一次运行建议使用私有 Kernel。
+日志首先断言 CUDA 可用，再执行 CPU 最小配置 dry run，最后使用 `reference_textcnn.yaml` 完整训练。完整参考运行约 2.5 分钟，但排队、网络和不同 Kaggle 镜像会改变总时间。
 
-## 产物
+## 下载证据
 
-Kaggle 的 `/kaggle/working` 是可写临时磁盘。任务完成后立即下载：
+状态为 `COMPLETE` 后执行：
 
 ```bash
 kaggle kernels output <你的用户名>/pytorch-text-classification-lab-ag-news-gpu \
   --file-pattern 'artifacts/.*' -p kaggle-output
 ```
 
-重点文件：
+保留 `best.pt`、`last.pt`、`config.yaml`、`tokenizer.json`、`metrics.csv`、`run.json`、evaluation 和 `kaggle-run-summary.json`。Kaggle 的 `/kaggle/working` 是临时磁盘，不下载就会丢失。
 
-```text
-artifacts/kaggle-agnews-textcnn/best.pt
-artifacts/kaggle-agnews-textcnn/last.pt
-artifacts/kaggle-agnews-textcnn/metrics.csv
-artifacts/kaggle-agnews-textcnn/evaluation/metrics.json
-artifacts/kaggle-agnews-textcnn/evaluation/errors.jsonl
-artifacts/kaggle-run-summary.json
-```
+## 中断和续训
 
-不要只保存 `best.pt`。配置、metrics、evaluation 和运行摘要是复现实验结论所需的证据。
-
-## 会话中断与续训
-
-Kaggle 会话存在时间限制。项目保存 `last.pt`，可以在新的运行中将上一轮产物放入 `/kaggle/working/artifacts`，再使用：
+把上一轮完整运行目录恢复到相同路径，并增加总 epoch：
 
 ```bash
 text-classify train --config configs/reference_textcnn.yaml \
   --resume artifacts/kaggle-agnews-textcnn/last.pt \
-  --set device=cuda
+  --set train.epochs=12 --set device=cuda
 ```
 
-续训前应确认 tokenizer、manifest、模型配置和训练超参数没有发生不受控变化。
+不要从不可信来源加载 checkpoint。续训会验证 manifest、模型、tokenizer 和优化器关键参数。
 
-## 常见问题
+## 发布结果
 
-| 问题 | 检查方式 |
-|---|---|
-| `torch.cuda.is_available()` 为 False | Kaggle Settings 是否选择 GPU |
-| 找不到项目 | 检查 `PROJECT_URL` 是否公开可访问 |
-| 下载失败 | 确认 Kernel 开启 Internet |
-| OOM | 减小 batch size 或 max length |
-| GPU 利用率低 | 增加 batch size、`num_workers` 或使用 TextCNN |
-| 结果会话后消失 | 任务结束前或结束后下载 `artifacts/` |
-| 续训结果异常 | 检查 manifest identity 和 tokenizer metadata |
-
-参考运行发布前，应记录 Kaggle GPU 型号、PyTorch/CUDA 版本、Git revision、数据来源 hash、manifest hash、配置和完整产物。
+先用验证集选择设置，再评估一次测试集。发布页面应给出精确 git revision、数据和 manifest identity、最终配置、依赖环境、GPU、墙钟时间、完整指标和错误分析，不发布估算数字。

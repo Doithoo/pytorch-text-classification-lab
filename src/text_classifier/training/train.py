@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import platform
 import random
+import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -15,24 +18,57 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from ..data.dataset import TextClassificationDataset, make_collate_fn
-from ..data.manifest import load_manifest, manifest_identity
+from ..data.manifest import load_manifest, load_manifest_metadata, manifest_identity
 from ..data.tokenizer import SimpleWordTokenizer
 from ..evaluation.metrics import classification_metrics, save_json
 from ..models import build_model
+from .checkpoint import load_checkpoint
 
 
-def set_seed(seed: int) -> None:
+def set_seed(seed: int, deterministic: bool = False) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    torch.use_deterministic_algorithms(deterministic)
+    if torch.backends.cudnn.is_available():
+        torch.backends.cudnn.benchmark = not deterministic
+        torch.backends.cudnn.deterministic = deterministic
 
 
 def resolve_device(value: str) -> torch.device:
     if value == "auto":
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    return torch.device(value)
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        if torch.backends.mps.is_available():
+            return torch.device("mps")
+        return torch.device("cpu")
+    device = torch.device(value)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA was requested but is not available")
+    if device.type == "mps" and not torch.backends.mps.is_available():
+        raise RuntimeError("MPS was requested but is not available")
+    return device
+
+
+def _build_optimizer(model: nn.Module, config: dict[str, Any]) -> torch.optim.Optimizer:
+    train_config = config["train"]
+    learning_rate = float(train_config["lr"])
+    weight_decay = float(train_config["weight_decay"])
+    name = str(train_config["optimizer"])
+    if name == "adamw":
+        return torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    if name == "adam":
+        return torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    if name == "sgd":
+        return torch.optim.SGD(
+            model.parameters(),
+            lr=learning_rate,
+            momentum=float(train_config["momentum"]),
+            weight_decay=weight_decay,
+        )
+    raise ValueError(f"unsupported optimizer: {name}")
 
 
 def _loader(config: dict[str, Any], split: str, tokenizer: SimpleWordTokenizer, shuffle: bool) -> DataLoader:
@@ -69,7 +105,12 @@ def _forward(model: nn.Module, batch: dict[str, Any], device: torch.device) -> t
 
 
 def evaluate_loader(
-    model: nn.Module, loader: DataLoader, device: torch.device, num_classes: int, return_errors: bool = False
+    model: nn.Module,
+    loader: DataLoader,
+    device: torch.device,
+    num_classes: int,
+    return_errors: bool = False,
+    label_names: list[str] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     model.eval()
     labels: list[int] = []
@@ -92,10 +133,20 @@ def evaluate_loader(
                     strict=True,
                 ):
                     if true != pred:
-                        errors.append(
-                            {"id": sample_id, "text": text, "true": true, "pred": pred, "confidence": confidence}
-                        )
+                        row: dict[str, Any] = {
+                            "id": sample_id,
+                            "text": text,
+                            "true": true,
+                            "pred": pred,
+                            "confidence": confidence,
+                        }
+                        if label_names is not None:
+                            row["true_label"] = label_names[true]
+                            row["pred_label"] = label_names[pred]
+                        errors.append(row)
     metrics = classification_metrics(labels, predictions, num_classes)
+    if label_names is not None:
+        metrics["label_names"] = label_names
     errors.sort(key=lambda row: float(row["confidence"]), reverse=True)
     return metrics, errors
 
@@ -116,6 +167,7 @@ def _checkpoint(
     tokenizer: SimpleWordTokenizer,
     epoch: int,
     metrics: dict[str, Any],
+    label_names: list[str],
     scaler: torch.amp.GradScaler | None = None,
 ) -> dict[str, Any]:
     return {
@@ -127,18 +179,54 @@ def _checkpoint(
         "scaler_state_dict": scaler.state_dict() if scaler is not None else None,
         "epoch": epoch,
         "metrics": metrics,
+        "label_names": label_names,
         "config": config,
         "tokenizer_metadata": tokenizer.metadata(),
         "manifest_identity": manifest_identity(config["data"]["manifest_dir"]),
     }
 
 
+def _sha256_json(value: Any) -> str:
+    return hashlib.sha256(json.dumps(value, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def _git_revision() -> str | None:
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def _file_sha256(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _validate_resume_config(config: dict[str, Any], checkpoint: dict[str, Any]) -> None:
+    previous = checkpoint["config"]
+    if config["model"] != previous["model"]:
+        raise ValueError("resume requires the same model configuration as the checkpoint")
+    for key in ("name", "tokenizer", "vocab_size", "min_frequency", "max_length"):
+        if config["data"][key] != previous["data"][key]:
+            raise ValueError(f"resume requires unchanged data.{key}")
+    for key in ("optimizer", "lr", "weight_decay", "momentum", "best_metric"):
+        if config["train"][key] != previous["train"][key]:
+            raise ValueError(f"resume requires unchanged train.{key}")
+
+
 def train(config: dict[str, Any], dry_run: bool = False, resume: str | None = None) -> Path | None:
-    set_seed(int(config["train"]["seed"]))
+    started = time.time()
+    set_seed(int(config["train"]["seed"]), bool(config["train"]["deterministic"]))
     device = resolve_device(str(config["device"]))
     checkpoint: dict[str, Any] | None = None
     if resume:
-        checkpoint = torch.load(resume, map_location=device, weights_only=False)
+        checkpoint = load_checkpoint(resume, map_location=device)
+        _validate_resume_config(config, checkpoint)
         expected_identity = manifest_identity(config["data"]["manifest_dir"])
         if checkpoint["manifest_identity"] != expected_identity:
             raise ValueError("resume checkpoint manifest identity does not match current prepared data")
@@ -146,16 +234,18 @@ def train(config: dict[str, Any], dry_run: bool = False, resume: str | None = No
         tokenizer = SimpleWordTokenizer(tokenizer_metadata["vocab"], int(tokenizer_metadata["max_length"]))
     else:
         tokenizer = _build_tokenizer(config)
-    num_classes = 4
+    metadata = load_manifest_metadata(config["data"]["manifest_dir"])
+    label_names = [str(label) for label in metadata["labels"]]
+    num_classes = len(label_names)
     model = build_model(str(config["model"]["name"]), len(tokenizer.vocab), num_classes, config["model"])
     model.to(device)
-    optimizer = torch.optim.AdamW(
-        model.parameters(), lr=float(config["train"]["lr"]), weight_decay=float(config["train"]["weight_decay"])
-    )
+    optimizer = _build_optimizer(model, config)
     amp_enabled = bool(config["train"].get("amp", False)) and device.type == "cuda"
     scaler = torch.amp.GradScaler("cuda", enabled=amp_enabled)
     start_epoch = 0
     if checkpoint is not None:
+        if checkpoint.get("optimizer_state_dict") is None:
+            raise ValueError("resume checkpoint does not contain optimizer_state_dict")
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         if checkpoint.get("scaler_state_dict") is not None:
@@ -223,22 +313,35 @@ def train(config: dict[str, Any], dry_run: bool = False, resume: str | None = No
         }
         history.append(record)
         print(json.dumps(record))
-        payload = _checkpoint(model, optimizer, config, tokenizer, epoch, valid_metrics, scaler)
+        payload = _checkpoint(model, optimizer, config, tokenizer, epoch, valid_metrics, label_names, scaler)
         torch.save(payload, run_dir / "last.pt")
         if float(valid_metrics[config["train"]["best_metric"]]) > best_metric:
             best_metric = float(valid_metrics[config["train"]["best_metric"]])
             torch.save(payload, run_dir / "best.pt")
     _save_metrics_csv(run_dir / "metrics.csv", history)
+    tokenizer_metadata = tokenizer.metadata()
+    resolved_manifest_identity = manifest_identity(config["data"]["manifest_dir"])
     save_json(
         run_dir / "run.json",
         {
+            "schema_version": 2,
             "device": str(device),
             "cuda_version": torch.version.cuda,
-            "gpu_name": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
+            "gpu_name": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
             "torch_version": torch.__version__,
             "python_version": platform.python_version(),
-            "manifest_identity": manifest_identity(config["data"]["manifest_dir"]),
+            "platform": platform.platform(),
+            "git_revision": _git_revision(),
+            "command": sys.argv,
+            "elapsed_seconds": round(time.time() - started, 3),
+            "manifest_identity": resolved_manifest_identity,
+            "config_sha256": _sha256_json(config),
+            "tokenizer_sha256": _sha256_json(tokenizer_metadata),
+            "uv_lock_sha256": _file_sha256(Path("uv.lock")),
+            "label_names": label_names,
+            "best_metric_name": config["train"]["best_metric"],
             "best_metric": best_metric,
+            "deterministic": bool(config["train"]["deterministic"]),
         },
     )
     return run_dir

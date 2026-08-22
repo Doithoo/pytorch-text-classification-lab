@@ -1,4 +1,21 @@
 include README.md
 include README.zh-CN.md
-recursive-include configs *.yaml
-recursive-include src *.py *.typed
+include CHANGELOG.md
+include CONTRIBUTING.md
+include CONTRIBUTING.zh-CN.md
+include SECURITY.md
+include CITATION.cff
+include Makefile
+recursive-include configs *.yaml *.md
+recursive-include docs *.md *.png
+recursive-include docs/recorded-run *.csv *.yaml
+recursive-include docs/recorded-run/kaggle *.py *.json
+include docs/recorded-run/kaggle-agnews-textcnn/run.json
+include docs/recorded-run/kaggle-agnews-textcnn/kaggle-run-summary.json
+include docs/recorded-run/kaggle-agnews-textcnn/evaluation/metrics.json
+exclude docs/recorded-run/kaggle-agnews-textcnn/tokenizer.json
+exclude docs/recorded-run/kaggle-agnews-textcnn/evaluation/errors.jsonl
+recursive-include examples *.py *.md
+recursive-include scripts *.py *.md
+recursive-include src *.py *.typed *.md
+recursive-include tests *.py *.md

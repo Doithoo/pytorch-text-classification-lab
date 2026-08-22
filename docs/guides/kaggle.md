@@ -1,8 +1,11 @@
 # Kaggle Training Guide
 
-Kaggle GPU is the primary training environment for this repository. The runner targets a single NVIDIA T4 and uses `cuda:0`.
+[中文](kaggle.zh-CN.md) | [Documentation index](../README.md)
 
-Before submitting, push the repository to GitHub and update `PROJECT_URL` in `docs/recorded-run/kaggle/run_kaggle.py`.
+The full training environment is one Kaggle Tesla T4. The runner uses `cuda:0` and does not depend on multiple GPUs.
+
+## Prepare
+
 Install and authenticate the Kaggle CLI:
 
 ```bash
@@ -10,26 +13,46 @@ uv tool install kaggle
 kaggle auth login
 ```
 
-Replace the account name in `kernel-metadata.json`, then submit:
+Edit `docs/recorded-run/kaggle/kernel-metadata.json` and replace `yashowhoo` in `id` with your Kaggle account. Keep GPU, Internet, and T4 settings. The runner clones a public repository and downloads AG News, so the default branch must be accessible. For a fork, also update `PROJECT_URL` in `run_kaggle.py`.
+
+## Submit and observe
 
 ```bash
 kaggle kernels push -p docs/recorded-run/kaggle
 kaggle kernels status <your-user>/pytorch-text-classification-lab-ag-news-gpu
 ```
 
-The runner performs:
+The sequence is:
 
 ```text
-git clone -> install -> download AG News -> prepare manifests -> inspect -> dry run -> CUDA training -> test evaluation
+git clone -> install -> download -> prepare -> inspect -> dry run -> train -> evaluate
 ```
 
-Download results before the temporary working volume disappears:
+The log first asserts CUDA, then performs a minimal dry run, then trains `reference_textcnn.yaml`. The recorded run took about 2.5 minutes, but queues, network, and Kaggle images change wall time.
+
+## Download evidence
+
+After status becomes `COMPLETE`:
 
 ```bash
 kaggle kernels output <your-user>/pytorch-text-classification-lab-ag-news-gpu \
   --file-pattern 'artifacts/.*' -p kaggle-output
 ```
 
-Keep the checkpoint together with its config, metrics, evaluation, errors, and `kaggle-run-summary.json`.
-The project writes `last.pt` for resuming after a session interruption. Resume only after checking the tokenizer,
-manifest identity, model config, and training parameters.
+Retain `best.pt`, `last.pt`, `config.yaml`, `tokenizer.json`, `metrics.csv`, `run.json`, evaluation, and `kaggle-run-summary.json`. `/kaggle/working` is temporary.
+
+## Interruptions and resume
+
+Restore the previous complete run directory and increase total epochs:
+
+```bash
+text-classify train --config configs/reference_textcnn.yaml \
+  --resume artifacts/kaggle-agnews-textcnn/last.pt \
+  --set train.epochs=12 --set device=cuda
+```
+
+Never load an untrusted checkpoint. Resume validates manifest, model, tokenizer, and important optimizer settings.
+
+## Publish a result
+
+Select settings on validation, then evaluate test once. A publication page should include exact git revision, dataset and manifest identity, resolved config, dependency environment, GPU, wall time, full metrics, and errors. Do not publish estimated metrics.

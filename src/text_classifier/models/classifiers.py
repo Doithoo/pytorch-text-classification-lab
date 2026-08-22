@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from typing import Any
 
 import torch
+import torch.nn.functional as F
 from torch import nn
 
 
@@ -33,15 +34,27 @@ class TextCNNClassifier(nn.Module):
     ) -> None:
         super().__init__()
         sizes = kernel_sizes or [3, 4, 5]
+        self.kernel_sizes = sizes
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
         self.convs = nn.ModuleList([nn.Conv1d(embedding_dim, channels, size) for size in sizes])
         self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(channels * len(sizes), num_classes)
 
     def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
-        del attention_mask
+        padding = max(0, max(self.kernel_sizes) - input_ids.shape[1])
+        if padding:
+            input_ids = F.pad(input_ids, (0, padding), value=0)
+            attention_mask = F.pad(attention_mask, (0, padding), value=0)
         embedded = self.embedding(input_ids).transpose(1, 2)
-        features = [torch.relu(conv(embedded)).amax(dim=2) for conv in self.convs]
+        lengths = attention_mask.sum(dim=1)
+        features = []
+        for kernel_size, conv in zip(self.kernel_sizes, self.convs, strict=True):
+            convolved = torch.relu(conv(embedded))
+            valid_windows = (lengths - kernel_size + 1).clamp(min=1, max=convolved.shape[2])
+            positions = torch.arange(convolved.shape[2], device=input_ids.device).unsqueeze(0)
+            valid_mask = positions < valid_windows.unsqueeze(1)
+            convolved = convolved.masked_fill(~valid_mask.unsqueeze(1), torch.finfo(convolved.dtype).min)
+            features.append(convolved.amax(dim=2))
         return self.classifier(self.dropout(torch.cat(features, dim=1)))
 
 

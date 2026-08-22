@@ -1,15 +1,15 @@
-# Recorded Kaggle Run
+# Recorded-Run Evidence
 
-This directory contains the reproducible Kaggle runner and Kernel metadata. It does not yet claim a reference
-metric: the GitHub repository must be published and the first T4 run must complete before measured results are
-added here.
+[中文](README.zh-CN.md) | [Documentation index](../README.md)
 
-A published run should retain:
+This directory contains the reproducible Kaggle runner, Kernel metadata, and machine-readable evidence from completed runs.
 
-- exact Git revision and resolved configuration;
-- source and manifest SHA-256 identities;
-- Kaggle GPU, PyTorch, CUDA, and Python versions;
-- `metrics.csv`, `best.pt`, `last.pt`, test metrics, and confidence-ranked errors;
-- wall-clock duration and the unmodified `kaggle-run-summary.json`.
+Published run:
 
-Follow [the Kaggle guide](../guides/kaggle.md) to create the first run.
+| Run | Model | Test accuracy | Test macro-F1 | Page |
+| --- | --- | ---: | ---: | --- |
+| `kaggle-agnews-textcnn` | TextCNN | 0.914605 | 0.914610 | [Details](kaggle-agnews-textcnn/README.md) |
+
+A run retains exact git revision, resolved config, source and manifest identity, tokenizer, epoch metrics, Kaggle GPU/PyTorch/CUDA/Python, test metrics, and high-confidence errors. The 93 MB checkpoints remain in Kaggle output instead of Git.
+
+`kaggle/` is a resubmittable runner, not a run result. Add a separate directory for new results and do not replace historical evidence. Never describe dry-run or sample-limited results as a full benchmark.

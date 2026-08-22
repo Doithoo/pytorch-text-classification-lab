@@ -1,0 +1,23 @@
+name: Documentation or learning issue
+description: Report unclear, stale, or missing learning material
+title: "docs: "
+labels: [documentation]
+body:
+  - type: textarea
+    id: page
+    attributes:
+      label: Page or command
+      description: Link the page or name the command and section.
+    validations:
+      required: true
+  - type: textarea
+    id: confusion
+    attributes:
+      label: What is unclear or incorrect?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Suggested outcome
+      description: Describe what answer, example, or expected output would resolve it.

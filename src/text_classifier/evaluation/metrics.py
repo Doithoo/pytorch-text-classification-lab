@@ -8,6 +8,12 @@ import numpy as np
 
 
 def classification_metrics(labels: list[int], predictions: list[int], num_classes: int) -> dict[str, Any]:
+    if len(labels) != len(predictions):
+        raise ValueError("labels and predictions must have equal length")
+    if num_classes < 1:
+        raise ValueError("num_classes must be positive")
+    if any(value < 0 or value >= num_classes for value in [*labels, *predictions]):
+        raise ValueError("labels and predictions must be valid class IDs")
     matrix = np.zeros((num_classes, num_classes), dtype=np.int64)
     for label, prediction in zip(labels, predictions, strict=True):
         matrix[label, prediction] += 1

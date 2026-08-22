@@ -26,7 +26,13 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy
         if: matrix.python-version == '3.10'
-      - run: uv run pytest tests -W error::DeprecationWarning
+      - run: uv run pre-commit run --all-files
+        if: matrix.python-version == '3.10'
+      - run: uv run pytest -W error::DeprecationWarning
+      - run: |
+          uv run text-classify --version
+          uv run text-classify list-models
+          uv run text-classify show-config --config configs/learning_minimal.yaml
 
   package:
     runs-on: ubuntu-latest
@@ -38,5 +44,8 @@ jobs:
       - run: uv sync --locked --extra dev
       - run: uv build
       - run: uv run twine check dist/*
-      - run: uv run text-classify --version
-      - run: uv run text-classify list-models
+      - run: uv venv --python 3.12 /tmp/text-classification-wheel-smoke
+      - run: uv pip install --python /tmp/text-classification-wheel-smoke/bin/python dist/*.whl
+      - run: |
+          /tmp/text-classification-wheel-smoke/bin/text-classify --version
+          /tmp/text-classification-wheel-smoke/bin/text-classify list-models
