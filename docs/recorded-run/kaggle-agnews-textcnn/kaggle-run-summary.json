@@ -1,0 +1,7 @@
+{
+  "project_url": "https://github.com/Doithoo/pytorch-text-classification-lab.git",
+  "git_revision": "4ed733b532b9169816d02797fece33e34135bc20",
+  "elapsed_seconds": 151.3,
+  "device": "cuda",
+  "checkpoint": "/kaggle/working/artifacts/kaggle-agnews-textcnn/best.pt"
+}

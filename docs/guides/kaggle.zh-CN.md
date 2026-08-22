@@ -15,7 +15,7 @@ kaggle auth login
 
 ```json
 {
-  "id": "你的用户名/pytorch-text-classification-lab-agnews-gpu",
+  "id": "你的用户名/pytorch-text-classification-lab-ag-news-gpu",
   "enable_gpu": "true",
   "enable_internet": "true",
   "machine_shape": "NvidiaTeslaT4"
@@ -28,7 +28,7 @@ kaggle auth login
 
 ```bash
 kaggle kernels push -p docs/recorded-run/kaggle
-kaggle kernels status <你的用户名>/pytorch-text-classification-lab-agnews-gpu
+kaggle kernels status <你的用户名>/pytorch-text-classification-lab-ag-news-gpu
 ```
 
 runner 执行顺序为：
@@ -44,7 +44,7 @@ git clone -> pip install -> download AG News -> prepare manifest -> inspect -> d
 Kaggle 的 `/kaggle/working` 是可写临时磁盘。任务完成后立即下载：
 
 ```bash
-kaggle kernels output <你的用户名>/pytorch-text-classification-lab-agnews-gpu \
+kaggle kernels output <你的用户名>/pytorch-text-classification-lab-ag-news-gpu \
   --file-pattern 'artifacts/.*' -p kaggle-output
 ```
 

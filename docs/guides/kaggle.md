@@ -14,7 +14,7 @@ Replace the account name in `kernel-metadata.json`, then submit:
 
 ```bash
 kaggle kernels push -p docs/recorded-run/kaggle
-kaggle kernels status <your-user>/pytorch-text-classification-lab-agnews-gpu
+kaggle kernels status <your-user>/pytorch-text-classification-lab-ag-news-gpu
 ```
 
 The runner performs:
@@ -26,7 +26,7 @@ git clone -> install -> download AG News -> prepare manifests -> inspect -> dry 
 Download results before the temporary working volume disappears:
 
 ```bash
-kaggle kernels output <your-user>/pytorch-text-classification-lab-agnews-gpu \
+kaggle kernels output <your-user>/pytorch-text-classification-lab-ag-news-gpu \
   --file-pattern 'artifacts/.*' -p kaggle-output
 ```
 

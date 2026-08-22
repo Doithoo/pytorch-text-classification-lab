@@ -1,0 +1,9 @@
+{
+  "device": "cuda",
+  "cuda_version": "12.8",
+  "gpu_name": "Tesla T4",
+  "torch_version": "2.10.0+cu128",
+  "python_version": "3.12.13",
+  "manifest_identity": "46780f09619b8d57e203a2719b2eec3ec3ea2b2a4039619a0673a1488ebb3447",
+  "best_metric": 0.91590894273007
+}

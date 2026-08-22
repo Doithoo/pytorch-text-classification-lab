@@ -21,13 +21,13 @@ kaggle auth login
 
 ```bash
 kaggle kernels push -p docs/recorded-run/kaggle
-kaggle kernels status <你的用户名>/pytorch-text-classification-lab-agnews-gpu
+kaggle kernels status <你的用户名>/pytorch-text-classification-lab-ag-news-gpu
 ```
 
 训练结束后下载产物：
 
 ```bash
-kaggle kernels output <你的用户名>/pytorch-text-classification-lab-agnews-gpu \
+kaggle kernels output <你的用户名>/pytorch-text-classification-lab-ag-news-gpu \
   --file-pattern 'artifacts/.*' -p kaggle-output
 ```
 

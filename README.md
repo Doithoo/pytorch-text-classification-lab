@@ -13,8 +13,8 @@ The recommended path is documented in [the Kaggle guide](docs/guides/kaggle.zh-C
 ```bash
 kaggle auth login
 kaggle kernels push -p docs/recorded-run/kaggle
-kaggle kernels status <your-user>/pytorch-text-classification-lab-agnews-gpu
-kaggle kernels output <your-user>/pytorch-text-classification-lab-agnews-gpu --file-pattern 'artifacts/.*' -p kaggle-output
+kaggle kernels status <your-user>/pytorch-text-classification-lab-ag-news-gpu
+kaggle kernels output <your-user>/pytorch-text-classification-lab-ag-news-gpu --file-pattern 'artifacts/.*' -p kaggle-output
 ```
 
 The runner enables Internet, downloads AG News into the writable `/kaggle/working` volume, prepares fixed
