@@ -12,6 +12,9 @@ recursive-include docs *.md *.png
 recursive-include docs/recorded-run *.csv *.yaml
 recursive-include docs/recorded-run/kaggle *.py *.json
 recursive-include docs/recorded-run/kaggle-comparison *.py *.json
+recursive-include docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0 *.csv *.json
+exclude docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0/**/tokenizer.json
+exclude docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0/**/errors.jsonl
 include docs/recorded-run/kaggle-agnews-textcnn/run.json
 include docs/recorded-run/kaggle-agnews-textcnn/kaggle-run-summary.json
 include docs/recorded-run/kaggle-agnews-textcnn/evaluation/metrics.json

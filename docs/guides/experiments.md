@@ -15,4 +15,4 @@ uv run text-classify compare-runs artifacts/kaggle-agnews-embedding-bag \
 
 Use `show-config` to verify seed, sample limits, epochs, batch size, learning rate, and optimizer. Model structure may differ, but tokenizer and manifest should match. Select settings on validation and evaluate the same test manifest only after selection.
 
-The Kaggle three-model runner lives under `docs/recorded-run/kaggle-comparison/`. It has not run yet and publishes no new scores. A completed record should retain all three run directories, comparison, exact revision, and failures, not only the winning model.
+The Kaggle three-model runner lives under `docs/recorded-run/kaggle-comparison/`. The `0.3.0` run is complete; see [its evidence](../recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.md). A future completed record should retain all three run directories, comparison, exact revision, and failures, not only the winning model.

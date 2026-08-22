@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "device": "cuda",
+  "cuda_version": "12.8",
+  "gpu_name": "Tesla T4",
+  "torch_version": "2.10.0+cu128",
+  "python_version": "3.12.13",
+  "platform": "Linux-6.12.90+-x86_64-with-glibc2.35",
+  "git_revision": "0b350f27f3af6d1cbb417f064f3c546a9af11b46",
+  "command": [
+    "/usr/local/bin/text-classify",
+    "train",
+    "--config",
+    "configs/reference_bilstm.yaml",
+    "--set",
+    "data.data_dir=/kaggle/working/data/raw",
+    "--set",
+    "data.manifest_dir=/kaggle/working/data/manifests",
+    "--set",
+    "output_dir=/kaggle/working/artifacts",
+    "--set",
+    "device=cuda"
+  ],
+  "elapsed_seconds": 229.885,
+  "manifest_identity": "46780f09619b8d57e203a2719b2eec3ec3ea2b2a4039619a0673a1488ebb3447",
+  "config_sha256": "4835397f47161feec3b96784641c5da85d0f65071746cfa66611f8d4f3b3ee6c",
+  "tokenizer_sha256": "1797a6c4c25c25ba9dfdf881e32b3baf63ac59d72ebca5f1d160d9169985bb39",
+  "uv_lock_sha256": "a72f975e2a10696879c5e80dfa7f547123c112a04e90d157eb95d0b0831fcef9",
+  "label_names": [
+    "world",
+    "sports",
+    "business",
+    "sci_tech"
+  ],
+  "best_metric_name": "macro_f1",
+  "best_metric": 0.924121487158719,
+  "deterministic": false
+}

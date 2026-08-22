@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "project_url": "https://github.com/Doithoo/pytorch-text-classification-lab.git",
+  "git_revision": "0b350f27f3af6d1cbb417f064f3c546a9af11b46",
+  "elapsed_seconds": 514.6,
+  "device": "cuda",
+  "runs": [
+    "kaggle-agnews-embedding-bag",
+    "kaggle-agnews-textcnn",
+    "kaggle-agnews-bilstm"
+  ]
+}

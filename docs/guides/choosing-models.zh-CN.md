@@ -14,4 +14,4 @@
 
 至少记录最佳验证 macro-F1、训练耗时、参数量、截断率和错误类型。AG News 类别均衡，accuracy 与 macro-F1 接近是合理现象；若两者分离，应先检查逐类支持和混淆矩阵。
 
-当前 TextCNN 的 Kaggle 实测优于“只有配置、没有完整运行”的 BiLSTM，因此仓库不会给 BiLSTM 声明估算成绩。要得到可发布对比，应按[实验指南](experiments.zh-CN.md)完成同协议训练。
+当前三模型参考运行显示：BiLSTM test macro-F1 **0.915985**，EmbeddingBag `0.915278`，TextCNN `0.910090`。BiLSTM 分数最高但训练耗时约为 EmbeddingBag 的 3.7 倍；EmbeddingBag 以很低的成本接近最优。TextCNN 的局部 n-gram 设计仍适合教学和 GPU 并行，但本次配置没有超过另外两者。完整协议和限制见[三模型对比参考运行](../recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.zh-CN.md)。

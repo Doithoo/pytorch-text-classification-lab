@@ -10,8 +10,8 @@ All notable changes are documented here. The project follows semantic versioning
 - Manifest audit evidence for duplicate IDs/text, cross-split leakage, conflicting labels, truncation, and tokenizer OOV.
 - Reusable batch CSV/JSONL prediction through `predict-file`.
 - Safe inference export to `.safetensors` plus JSON metadata, directly loadable by prediction commands.
-- Identity-validated run comparison through `compare-runs`.
-- Full-data EmbeddingBag config and a pending Kaggle three-model comparison runner.
+- The current Kaggle comparison reports BiLSTM test macro-F1 `0.915985`, EmbeddingBag `0.915278`, and TextCNN `0.910090` under one manifest and tokenizer.
+- Full-data EmbeddingBag config and a Kaggle three-model comparison runner, completed at revision `0b350f2` with published evidence.
 - MkDocs Material site, strict documentation build, GitHub Pages deployment, and tag release workflow.
 - Generic CSV architecture decision, configuration, documentation, and end-to-end tests.
 

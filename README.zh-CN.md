@@ -67,7 +67,17 @@ uv run text-classify compare-runs artifacts/run-a artifacts/run-b
 
 正常训练会保存最终配置、tokenizer、`best.pt`、`last.pt`、逐轮指标和运行身份。训练 checkpoint 基于 Python pickle，只加载你信任的文件；对外推理分发可用 `export-inference` 转为 `.safetensors`。
 
-## 在 Kaggle 训练
+## 三模型对比结果
+
+当前代码的同协议 Kaggle 运行已完成，结果与证据见[三模型对比参考运行](docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.zh-CN.md)：
+
+| 模型 | Test accuracy | Test macro-F1 |
+| --- | ---: | ---: |
+| BiLSTM | **0.916053** | **0.915985** |
+| EmbeddingBag | 0.915395 | 0.915278 |
+| TextCNN | 0.910132 | 0.910090 |
+
+这三行共享 manifest、tokenizer、seed、训练预算和 Tesla T4；旧 TextCNN 记录仍保留为历史 revision 证据。
 
 不要求本地 CUDA。安装并登录 Kaggle CLI 后，按[Kaggle 训练指南](docs/guides/kaggle.zh-CN.md)修改 Kernel 用户名并提交：
 

@@ -2,14 +2,10 @@
 
 [中文](README.zh-CN.md) | [Recorded-run index](../README.md)
 
-This directory provides an automated runner with no claimed result yet. It trains EmbeddingBag, TextCNN, and BiLSTM against one AG News manifest, evaluates each test split, and writes `comparison.json` through `compare-runs`.
+This directory provides the current-code three-model runner. It completed a real Tesla T4 run at revision `0b350f2`; see the [comparison reference run](../kaggle-agnews-model-comparison-v0.3.0/README.md) for published evidence.
 
-Before submission, replace the account in `kernel-metadata.json`. Fork users must also update `PROJECT_URL`:
+The runner trains EmbeddingBag, TextCNN, and BiLSTM on one AG News manifest, evaluates each test split, and writes `comparison.json` through `compare-runs`. Future submissions should use a new versioned directory and never replace an existing result.
 
 ```bash
 kaggle kernels push -p docs/recorded-run/kaggle-comparison
 ```
-
-Expected Kaggle `artifacts/` include three complete run directories, `comparison.json`, and `kaggle-comparison-summary.json`. This page publishes no estimated scores before completion.
-
-When publishing, copy machine-readable evidence except large checkpoints into a new versioned recorded-run directory and state the exact revision. The older TextCNN score cannot be inserted as a comparison row because code and run-metadata protocols differ.

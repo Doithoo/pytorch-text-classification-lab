@@ -61,7 +61,7 @@ text-classify train --config configs/reference_textcnn.yaml \
 kaggle kernels push -p docs/recorded-run/kaggle-comparison
 ```
 
-它会生成三个运行目录和经过 identity 校验的 `comparison.json`。该 runner 尚未完成真实运行，因此文档不声明新成绩。
+它会生成三个运行目录和经过 identity 校验的 `comparison.json`。`0.3.0` 运行已经完成，详见[发布证据](../recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.zh-CN.md)。未来再次提交应使用新的版本目录，不覆盖已有结果。
 
 ## 发布结果
 

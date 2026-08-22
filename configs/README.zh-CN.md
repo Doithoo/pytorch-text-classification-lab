@@ -12,11 +12,11 @@ uv run text-classify show-config --config configs/reference_textcnn.yaml
 | --- | --- | --- |
 | `learning_minimal.yaml` | CPU dry run 和小样本教程 | AG News 上限样本、EmbeddingBag |
 | `generic_csv_example.yaml` | 自有带表头 CSV 起点 | 任意单标签类别、TextCNN |
-| `reference_embedding_bag.yaml` | Kaggle 全量快速基线 | AG News、EmbeddingBag |
-| `reference_textcnn.yaml` | Kaggle 已有旧实测与新对比配置 | AG News、TextCNN |
-| `reference_bilstm.yaml` | Kaggle 序列模型对照 | AG News、2-layer BiLSTM |
+| `reference_embedding_bag.yaml` | Kaggle 全量快速基线和对比配置 | AG News、EmbeddingBag |
+| `reference_textcnn.yaml` | Kaggle 旧实测与当前对比配置 | AG News、TextCNN |
+| `reference_bilstm.yaml` | Kaggle 当前三模型对比配置 | AG News、2-layer BiLSTM |
 
-只有旧 revision 的 TextCNN 有已发布完整成绩。三个 reference 配置的新协议对比尚待 Kaggle runner 完成，不能把配置当性能声明。所有 embedding 随机初始化。
+旧 revision 有单独的 TextCNN 记录；`0.3.0` 的三个 reference 配置已经完成同协议对比，完整结果见[三模型对比参考运行](../docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.zh-CN.md)。所有 embedding 随机初始化。
 
 ```bash
 uv run text-classify prepare-data --config configs/generic_csv_example.yaml

@@ -12,11 +12,11 @@ uv run text-classify show-config --config configs/reference_textcnn.yaml
 | --- | --- | --- |
 | `learning_minimal.yaml` | CPU dry run and small tutorial | Limited AG News, EmbeddingBag |
 | `generic_csv_example.yaml` | Starting point for headered custom CSV | Arbitrary single-label classes, TextCNN |
-| `reference_embedding_bag.yaml` | Fast full Kaggle baseline | AG News, EmbeddingBag |
-| `reference_textcnn.yaml` | Older measured run and new comparison config | AG News, TextCNN |
-| `reference_bilstm.yaml` | Kaggle sequence comparison | AG News, 2-layer BiLSTM |
+| `reference_embedding_bag.yaml` | Full Kaggle baseline and comparison | AG News, EmbeddingBag |
+| `reference_textcnn.yaml` | Older Kaggle record and current comparison | AG News, TextCNN |
+| `reference_bilstm.yaml` | Current Kaggle three-model comparison | AG News, 2-layer BiLSTM |
 
-Only TextCNN at the older revision has a published full score. The current-protocol comparison across three reference configs awaits the Kaggle runner; configurations are not performance claims. All embeddings are randomly initialized.
+The older revision has a standalone TextCNN record. All three reference configs completed the same-protocol `0.3.0` comparison; see the [comparison reference run](../docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.md). All embeddings are randomly initialized.
 
 ```bash
 uv run text-classify prepare-data --config configs/generic_csv_example.yaml

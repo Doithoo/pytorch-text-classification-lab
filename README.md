@@ -67,6 +67,18 @@ uv run text-classify compare-runs artifacts/run-a artifacts/run-b
 
 A normal run stores the resolved config, tokenizer, `best.pt`, `last.pt`, epoch metrics, and run identity. Training checkpoints use Python pickle and must be trusted; use `export-inference` to create `.safetensors` for distribution.
 
+## Three-model comparison result
+
+The current-code controlled Kaggle run is complete. See the [three-model comparison reference](docs/recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.md) for evidence:
+
+| Model | Test accuracy | Test macro-F1 |
+| --- | ---: | ---: |
+| BiLSTM | **0.916053** | **0.915985** |
+| EmbeddingBag | 0.915395 | 0.915278 |
+| TextCNN | 0.910132 | 0.910090 |
+
+All three rows share the manifest, tokenizer, seed, training budget, and Tesla T4. The older TextCNN record remains as historical revision evidence.
+
 ## Kaggle training
 
 Local CUDA is optional. Authenticate the Kaggle CLI and follow the [Kaggle guide](docs/guides/kaggle.md) before submitting:

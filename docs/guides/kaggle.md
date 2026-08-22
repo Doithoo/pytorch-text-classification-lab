@@ -61,7 +61,7 @@ Never load an untrusted checkpoint. Resume validates manifest, model, tokenizer,
 kaggle kernels push -p docs/recorded-run/kaggle-comparison
 ```
 
-It writes three run directories and identity-validated `comparison.json`. The runner has not completed a real run, so documentation claims no new score.
+It writes three run directories and identity-validated `comparison.json`. The `0.3.0` run is complete; see the [published evidence](../recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.md). Future submissions should use a new versioned directory and never replace an existing result.
 
 ## Publish a result
 

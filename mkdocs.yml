@@ -79,10 +79,12 @@ nav:
       - Index: recorded-run/README.md
       - TextCNN result: recorded-run/kaggle-agnews-textcnn/README.md
       - Comparison runner: recorded-run/kaggle-comparison/README.md
+      - v0.3.0 comparison evidence: recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.md
   - 中文运行记录:
       - 索引: recorded-run/README.zh-CN.md
       - TextCNN 结果: recorded-run/kaggle-agnews-textcnn/README.zh-CN.md
       - 三模型 Runner: recorded-run/kaggle-comparison/README.zh-CN.md
+      - v0.3.0 对比证据: recorded-run/kaggle-agnews-model-comparison-v0.3.0/README.zh-CN.md
 markdown_extensions:
   - tables
   - fenced_code
