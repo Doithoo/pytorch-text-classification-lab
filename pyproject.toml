@@ -29,12 +29,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8,<9",
+    "pytest>=8,<10",
     "ruff>=0.6,<1",
-    "mypy>=1.15,<2",
+    "mypy>=1.15,<3",
     "types-PyYAML>=6,<7",
     "build>=1.2,<2",
-    "twine>=5,<7",
+    "twine>=5,<8",
     "pre-commit>=3.7,<5",
     "safetensors>=0.4,<1",
     "mkdocs-material>=9.5,<10",
