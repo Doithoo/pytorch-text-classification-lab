@@ -113,4 +113,4 @@ uv build
 uv run twine check dist/*
 ```
 
-行为修改必须带测试，双语文档应保持语义一致。贡献前请阅读[贡献指南](CONTRIBUTING.zh-CN.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。项目代码采用 [MIT License](LICENSE)。
+行为修改必须带测试，双语文档应保持语义一致。贡献前请阅读[贡献指南](CONTRIBUTING.zh-CN.md)和[安全策略](SECURITY.md)。项目代码采用 [MIT License](LICENSE)。

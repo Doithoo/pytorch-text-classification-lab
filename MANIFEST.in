@@ -1,10 +1,8 @@
 include README.md
 include README.zh-CN.md
-include CHANGELOG.md
 include CONTRIBUTING.md
 include CONTRIBUTING.zh-CN.md
 include SECURITY.md
-include CITATION.cff
 include Makefile
 include mkdocs.yml
 recursive-include configs *.yaml *.md

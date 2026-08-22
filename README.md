@@ -115,4 +115,4 @@ uv build
 uv run twine check dist/*
 ```
 
-Behavior changes require tests, and English/Chinese documentation should remain semantically aligned. Read [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and the [changelog](CHANGELOG.md) before contributing. Source code is available under the [MIT License](LICENSE).
+Behavior changes require tests, and English/Chinese documentation should remain semantically aligned. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md) before contributing. Source code is available under the [MIT License](LICENSE).
