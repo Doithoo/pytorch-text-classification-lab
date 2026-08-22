@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=77,<82"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytorch-text-classification-lab"
+version = "0.1.0"
+description = "A reproducible, beginner-oriented PyTorch text classification lab"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Yashowhoo" }]
+keywords = ["pytorch", "nlp", "text-classification", "education", "kaggle"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0,<3",
+    "numpy>=1.24,<3",
+    "pyyaml>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "ruff>=0.6,<1",
+    "mypy>=1.15,<2",
+    "types-PyYAML>=6,<7",
+    "build>=1.2,<2",
+    "twine>=5,<7",
+]
+plot = ["matplotlib>=3.6,<4"]
+transformers = [
+    "transformers>=4.40,<5",
+    "safetensors>=0.4,<1",
+]
+
+[project.urls]
+Homepage = "https://github.com/Doithoo/pytorch-text-classification-lab"
+Repository = "https://github.com/Doithoo/pytorch-text-classification-lab"
+
+[project.scripts]
+text-classify = "text_classifier.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+text_classifier = ["py.typed"]
+
+[tool.setuptools.data-files]
+"share/pytorch-text-classification-lab/configs" = [
+    "configs/learning_minimal.yaml",
+    "configs/reference_bilstm.yaml",
+    "configs/reference_textcnn.yaml",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests", "scripts", "examples"]
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src", "scripts", "examples"]
+check_untyped_defs = true
+no_implicit_optional = true
+warn_unused_ignores = true
+ignore_missing_imports = true

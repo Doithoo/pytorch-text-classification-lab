@@ -1,0 +1,31 @@
+data:
+  name: ag_news
+  data_dir: data/raw
+  manifest_dir: data/manifests
+  tokenizer: simple_word
+  vocab_size: 30000
+  min_frequency: 2
+  max_length: 128
+  valid_ratio: 0.1
+  num_workers: 0
+  max_train_samples: 256
+  max_valid_samples: 64
+  max_test_samples: 64
+model:
+  name: embedding_bag
+  embedding_dim: 128
+  hidden_dim: 128
+  dropout: 0.2
+train:
+  epochs: 2
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0001
+  optimizer: adamw
+  seed: 42
+  amp: false
+  grad_clip: 0.0
+  best_metric: macro_f1
+device: auto
+output_dir: artifacts
+run_name: null

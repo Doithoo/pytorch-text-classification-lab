@@ -1,0 +1,33 @@
+data:
+  name: ag_news
+  data_dir: data/raw
+  manifest_dir: data/manifests
+  tokenizer: simple_word
+  vocab_size: 30000
+  min_frequency: 2
+  max_length: 256
+  valid_ratio: 0.1
+  num_workers: 2
+  max_train_samples: null
+  max_valid_samples: null
+  max_test_samples: null
+model:
+  name: bilstm
+  embedding_dim: 256
+  hidden_dim: 128
+  dropout: 0.3
+  num_layers: 2
+  bidirectional: true
+train:
+  epochs: 8
+  batch_size: 128
+  lr: 0.001
+  weight_decay: 0.0001
+  optimizer: adamw
+  seed: 42
+  amp: true
+  grad_clip: 1.0
+  best_metric: macro_f1
+device: auto
+output_dir: artifacts
+run_name: kaggle-agnews-bilstm
