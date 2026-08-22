@@ -1,6 +1,6 @@
 # 文档首页
 
-[English](README.md) | [项目首页](../README.zh-CN.md)
+[English](README.md) | [项目首页](https://github.com/Doithoo/pytorch-text-classification-lab/blob/main/README.zh-CN.md)
 
 按当前目标选择页面。教程按顺序阅读；概念、指南和参考页用于理解设计或查找具体答案。
 
@@ -17,7 +17,8 @@
 - [代码导览](concepts/code-tour.zh-CN.md)：包边界和建议阅读顺序。
 - [配置流](concepts/configuration-flow.zh-CN.md)：默认值、YAML、`--set` 与验证。
 - [模型教程](tutorial/03-models.zh-CN.md)：EmbeddingBag、TextCNN 和 BiLSTM 的张量契约。
-- [架构决策](architecture/0001-reproducible-text-classification-contracts.zh-CN.md)：稳定契约和有意限制。
+- [架构决策](architecture/0001-reproducible-text-classification-contracts.zh-CN.md)：可复现实验契约。
+- [通用 CSV 决策](architecture/0002-generic-csv-dataset-contract.zh-CN.md)：adapter、标签顺序和审计边界。
 
 ## 我需要具体答案
 
@@ -33,4 +34,4 @@
 | 如何添加模型？ | [添加模型](guides/adding-models.zh-CN.md) |
 | AG News 能否再分发？ | [数据集说明](reference/ag-news.zh-CN.md) |
 
-配置、示例、脚本和测试目录也有独立入口：[configs](../configs/README.zh-CN.md)、[examples](../examples/README.zh-CN.md)、[scripts](../scripts/README.zh-CN.md)、[tests](../tests/README.zh-CN.md)。
+配置、示例、脚本和测试目录也有独立入口：[configs](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/configs)、[examples](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/examples)、[scripts](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/scripts)、[tests](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/tests)。

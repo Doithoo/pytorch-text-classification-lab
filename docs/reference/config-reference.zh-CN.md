@@ -8,10 +8,12 @@
 
 | 字段 | 默认值 | 约束与含义 |
 | --- | --- | --- |
-| `name` | `ag_news` | 当前只允许 AG News |
-| `data_dir` | `data/raw` | 包含 `ag_news_csv/` 的原始数据目录 |
-| `manifest_dir` | `data/manifests` | 准备后 CSV 和 `dataset.json` 目录 |
+| `name` | `ag_news` | `ag_news` 或带表头的 `generic_csv` |
+| `data_dir` | `data/raw` | AG News 根目录，或包含通用 train/test CSV 的目录 |
+| `manifest_dir` | `data/manifests` | 准备后 CSV、`dataset.json` 和审计目录 |
 | `tokenizer` | `simple_word` | 当前只允许内置词级 tokenizer |
+| `text_column` | `text` | generic CSV 正文列名 |
+| `label_column` | `label` | generic CSV 标签列名，必须与正文列不同 |
 | `vocab_size` | `30000` | 含 4 个特殊 token，至少 4 |
 | `min_frequency` | `2` | 训练词表最低词频，正整数 |
 | `max_length` | `128` | 含 BOS/EOS，至少 2 |

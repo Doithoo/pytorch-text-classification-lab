@@ -1,6 +1,6 @@
 # Documentation Index
 
-[中文](README.zh-CN.md) | [Project home](../README.md)
+[中文](README.zh-CN.md) | [Project home](https://github.com/Doithoo/pytorch-text-classification-lab)
 
 Choose a page by goal. Read the tutorial in order; use concepts, guides, and reference pages for design context or exact answers.
 
@@ -17,7 +17,8 @@ Choose a page by goal. Read the tutorial in order; use concepts, guides, and ref
 - [Code tour](concepts/code-tour.md): package boundaries and reading order.
 - [Configuration flow](concepts/configuration-flow.md): defaults, YAML, `--set`, and validation.
 - [Model tutorial](tutorial/03-models.md): tensor contracts for EmbeddingBag, TextCNN, and BiLSTM.
-- [Architecture decision](architecture/0001-reproducible-text-classification-contracts.md): stable contracts and intentional limits.
+- [Architecture decision](architecture/0001-reproducible-text-classification-contracts.md): reproducible experiment contracts.
+- [Generic CSV decision](architecture/0002-generic-csv-dataset-contract.md): adapters, label order, and audit boundaries.
 
 ## Find an exact answer
 
@@ -33,4 +34,4 @@ Choose a page by goal. Read the tutorial in order; use concepts, guides, and ref
 | How do I add a model? | [Adding models](guides/adding-models.md) |
 | Can AG News data be redistributed? | [Dataset note](reference/ag-news.md) |
 
-Directory-level guides are available for [configs](../configs/README.md), [examples](../examples/README.md), [scripts](../scripts/README.md), and [tests](../tests/README.md).
+Directory-level guides are available for [configs](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/configs), [examples](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/examples), [scripts](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/scripts), and [tests](https://github.com/Doithoo/pytorch-text-classification-lab/tree/main/tests).

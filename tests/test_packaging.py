@@ -10,7 +10,7 @@ ROOT = Path(__file__).parents[1]
 
 def test_installed_version_has_one_metadata_source() -> None:
     assert __version__ == version("pytorch-text-classification-lab")
-    assert __version__ == "0.2.0"
+    assert __version__ == "0.3.0"
 
 
 def test_package_metadata_has_project_links_and_license() -> None:

@@ -8,10 +8,12 @@ Final configuration is defaults merged with YAML and `--set`, then validated bef
 
 | Field | Default | Constraint and meaning |
 | --- | --- | --- |
-| `name` | `ag_news` | AG News only |
-| `data_dir` | `data/raw` | Raw root containing `ag_news_csv/` |
-| `manifest_dir` | `data/manifests` | Prepared CSV and `dataset.json` directory |
+| `name` | `ag_news` | `ag_news` or headered `generic_csv` |
+| `data_dir` | `data/raw` | AG News root or directory containing generic train/test CSV |
+| `manifest_dir` | `data/manifests` | Prepared CSV, `dataset.json`, and audit directory |
 | `tokenizer` | `simple_word` | Built-in word tokenizer only |
+| `text_column` | `text` | Generic CSV text column |
+| `label_column` | `label` | Generic CSV label column; must differ from text |
 | `vocab_size` | `30000` | Includes four special tokens; at least 4 |
 | `min_frequency` | `2` | Positive training-vocabulary frequency |
 | `max_length` | `128` | Includes BOS/EOS; at least 2 |

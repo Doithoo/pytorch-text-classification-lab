@@ -18,6 +18,16 @@ A project checkpoint is a mapping written by `torch.save`; current `schema_versi
 
 The loader validates file existence, mapping type, schema, required fields, configuration, and basic tokenizer structure. It fills current defaults when an older v1 config lacks later additive fields.
 
-Use `best.pt` for evaluation and inference and `last.pt` for interrupted training. Do not retain weights while discarding config, tokenizer, and manifest metadata.
+Use `best.pt` for evaluation and resume-related validation and `last.pt` for interrupted training. Both use pickle and must remain trusted. Convert a model for inference distribution:
+
+```bash
+uv sync --extra safe
+uv run text-classify export-inference --checkpoint artifacts/run/best.pt \
+  --output artifacts/run/model.safetensors
+```
+
+Export writes `.safetensors` weights and a `.safetensors.json` sidecar containing model config, tokenizer, labels, manifest identity, and weights SHA-256, without optimizer state or executable pickle. Loading verifies the weights hash. `predict` and `predict-file` load `.safetensors` directly.
+
+Do not retain training weights while discarding config, tokenizer, and manifest metadata.
 
 `torch.load(weights_only=False)` uses pickle, and a malicious file can execute code. Load only checkpoints produced by you or a trusted project run. Schema validation occurs after deserialization and cannot prevent pickle execution.

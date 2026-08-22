@@ -1,5 +1,7 @@
 __pycache__/
 *.py[cod]
+*.pt
+*.safetensors
 .venv/
 .pytest_cache/
 .mypy_cache/

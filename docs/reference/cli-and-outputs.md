@@ -4,14 +4,17 @@
 
 | Command | Purpose | Main output |
 | --- | --- | --- |
-| `show-config` | Merge and validate configuration | stdout YAML |
+| `show-config` | Merge and validate config | stdout YAML |
 | `list-models` | List registered models | stdout names |
-| `prepare-data` | Parse and split AG News | manifests, dataset.json, summary.txt |
-| `inspect-data` | Length, truncation, label statistics | stdout |
-| `train --dry-run` | One forward/backward batch | stdout, no files |
+| `prepare-data` | Build manifests through AG News or generic CSV adapter | CSV, dataset.json, summary.txt |
+| `inspect-data` | Audit lengths, labels, duplicates, leakage, and OOV | stdout, inspection.json |
+| `train --dry-run` | One forward/backward batch | stdout, no run files |
 | `train` | Train and validate | Run directory |
-| `evaluate` | Evaluate a validation or test split | `evaluation/<split>/` |
+| `evaluate` | Evaluate validation or test checkpoint | `evaluation/<split>/` |
 | `predict` | Single-text top-k | stdout JSON |
+| `predict-file` | Batch CSV/JSONL inference | JSONL |
+| `export-inference` | Convert trusted `.pt` to safe inference weights | `.safetensors` + JSON sidecar |
+| `compare-runs` | Compare runs sharing manifest and label protocols | stdout JSON, optional file |
 
 Normal run layout:
 
@@ -28,11 +31,15 @@ artifacts/<run>/
     test/metrics.json, errors.jsonl
 ```
 
-Evaluation refuses replacement by default. `--output` selects an exact directory and `--overwrite` explicitly replaces it. `--manifest-dir` can replace a machine-specific checkpoint path, but identity and labels must still match.
-
-Configuration commands accept `--config PATH` and repeated `--set KEY=VALUE`. Data paths are not direct `--data-dir` CLI options:
+Evaluation and batch prediction refuse overwrite by default. `--manifest-dir` may replace machine-specific checkpoint paths, but identity and labels must match. Batch CSV requires a `text` header; each JSONL row requires a string `text`. Output retains original fields and adds a `prediction` object; use `--overwrite` for intentional replacement.
 
 ```bash
-uv run text-classify prepare-data --config configs/learning_minimal.yaml \
-  --set data.data_dir=data/raw --set data.manifest_dir=data/manifests
+uv run text-classify export-inference --checkpoint artifacts/run/best.pt \
+  --output artifacts/run/model.safetensors
+uv run text-classify predict-file --checkpoint artifacts/run/model.safetensors \
+  --input texts.csv --output predictions.jsonl --top-k 3
+uv run text-classify compare-runs artifacts/baseline artifacts/textcnn \
+  --metric valid_macro_f1 --output artifacts/comparison.json
 ```
+
+`compare-runs` fails on different manifest identity, tokenizer hash, or label order. Config commands accept `--config PATH` and repeated `--set KEY=VALUE`.

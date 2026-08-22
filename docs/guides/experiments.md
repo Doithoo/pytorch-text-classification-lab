@@ -2,17 +2,17 @@
 
 [中文](experiments.zh-CN.md) | [Documentation index](../README.md)
 
-Begin with a question such as “under the same vocabulary and training budget, does TextCNN improve validation macro-F1 over EmbeddingBag?” Change one main factor per run and use unique names:
+Begin with a falsifiable question such as “under one manifest, vocabulary, and budget, does TextCNN improve validation macro-F1 over EmbeddingBag?” Change one main factor per run and use independent run names.
 
 ```bash
-uv run text-classify train --config configs/learning_minimal.yaml \
-  --set run_name=baseline --set model.name=embedding_bag
-uv run text-classify train --config configs/learning_minimal.yaml \
-  --set run_name=textcnn --set model.name=text_cnn
+uv run text-classify train --config configs/reference_embedding_bag.yaml
+uv run text-classify train --config configs/reference_textcnn.yaml
+uv run text-classify compare-runs artifacts/kaggle-agnews-embedding-bag \
+  artifacts/kaggle-agnews-textcnn --output artifacts/comparison.json
 ```
 
-Save `show-config` output first and verify manifest, seed, sample limits, epochs, batch size, learning rate, and optimizer. The commands above demonstrate mechanics; a formal comparison needs sufficient data and valid kernel/max-length settings.
+`compare-runs` first checks `manifest_identity`, `tokenizer_sha256`, and `label_names`, then selects the best requested validation epoch from each `metrics.csv` and includes revision and elapsed time. It fails on incompatible protocols instead of placing unrelated maxima together.
 
-Compare best validation values in `metrics.csv` and time, revision, config/tokenizer/manifest hashes in `run.json`. Evaluate the same test manifest only after model selection. Report negative and failed runs instead of retaining only the highest score.
+Use `show-config` to verify seed, sample limits, epochs, batch size, learning rate, and optimizer. Model structure may differ, but tokenizer and manifest should match. Select settings on validation and evaluate the same test manifest only after selection.
 
-There is no automatic aggregation command yet because incompatible protocols should not be merged silently. Use an explicit table today; a future `compare-runs` must validate identities and metric schema first.
+The Kaggle three-model runner lives under `docs/recorded-run/kaggle-comparison/`. It has not run yet and publishes no new scores. A completed record should retain all three run directories, comparison, exact revision, and failures, not only the winning model.

@@ -7,11 +7,11 @@ The installable package is `text_classifier`:
 ```text
 config.py               Configuration merge and validation
 cli.py                  text-classify entry point
-data/                    Manifests, tokenizer, Dataset, collate
+data/                    AG News/generic CSV adapters, manifests, audit, tokenizer, Dataset
 models/                  Three classifiers and registry
 training/                Training loop, checkpoints, run metadata
-evaluation/              Classification metrics
-inference/               Trusted-checkpoint text prediction
+evaluation/              Classification metrics and compatible-run comparison
+inference/               Trusted-checkpoint text and file prediction
 ```
 
 Dependency direction is CLI -> data/model/training/evaluation/inference; lower modules should not import CLI. Training and inference share model, tokenizer, and checkpoint contracts instead of duplicating deserialization.

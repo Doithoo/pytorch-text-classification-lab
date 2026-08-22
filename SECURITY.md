@@ -10,7 +10,9 @@ Do not disclose a vulnerability in a public issue before maintainers can assess 
 
 ## Trust boundaries
 
-PyTorch `.pt` checkpoints use pickle and may execute code while loading. The CLI deliberately describes checkpoint inputs as trusted. Never load a checkpoint supplied by an unknown user or expose `evaluate`, `predict`, or `resume` directly as an unauthenticated upload service.
+PyTorch `.pt` training checkpoints use pickle and may execute code while loading. The CLI deliberately describes `.pt` inputs as trusted. Never load an unknown user's training checkpoint or expose `evaluate`, `export-inference`, or `resume` as an unauthenticated upload service.
+
+For inference distribution, use `export-inference` to create `.safetensors` weights and a JSON sidecar. This avoids executable pickle during weight loading, but provenance and integrity still matter. The sidecar contains the complete vocabulary and may be a derived data asset.
 
 The download script verifies fixed SHA-256 values, but network and upstream repository trust still matter. Kaggle credentials and API tokens must stay outside the repository. Error-analysis files may contain complete source text; review privacy and dataset terms before sharing them.
 

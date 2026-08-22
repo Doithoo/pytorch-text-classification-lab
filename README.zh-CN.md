@@ -6,13 +6,13 @@
 
 **English: [README.md](README.md)**
 
-这是一个面向初学者、强调实验可复现性的 PyTorch 文本分类项目。项目以 AG News 为固定任务，完整展示数据下载、分层划分、训练集词表、动态 padding、经典模型、GPU 训练、评估、错误分析和 checkpoint 续训。
+这是一个面向初学者、强调实验可复现性的 PyTorch 文本分类项目。项目以 AG News 为参考任务，同时支持带表头的通用 CSV 二分类和多分类数据，完整展示数据准备、审计、分层划分、训练集词表、动态 padding、经典模型、GPU 训练、评估、错误分析和 checkpoint 续训。
 
 ```text
 download -> prepare -> inspect -> dry run -> train -> evaluate -> predict
 ```
 
-当前内置 `embedding_bag`、`text_cnn` 和 `bilstm`。项目有意先讲清经典文本分类的数据与训练契约；目前不支持任意数据集、预训练 Transformer 或生产部署。
+当前内置 `embedding_bag`、`text_cnn` 和 `bilstm`，并提供 `ag_news` 与 `generic_csv` 两个数据 adapter。项目聚焦单标签经典文本分类；目前不支持多标签、预训练 Transformer 或生产部署。
 
 ## 已完成的 Kaggle 训练
 
@@ -57,7 +57,15 @@ uv run text-classify predict --checkpoint artifacts/first-run/best.pt \
   --text "Stocks rose after the company reported strong earnings." --top-k 3
 ```
 
-正常训练会保存最终配置、tokenizer、`best.pt`、`last.pt`、逐轮指标和运行身份。checkpoint 基于 Python pickle，只加载你信任的文件。
+使用自己的 `text,label` CSV 时，从[自定义数据指南](docs/guides/using-your-data.zh-CN.md)和 `configs/generic_csv_example.yaml` 开始。`inspect-data` 会生成包含重复文本、跨 split 泄漏、标签冲突、截断和 OOV 的 `inspection.json`。批量预测和实验比较使用：
+
+```bash
+uv run text-classify predict-file --checkpoint artifacts/first-run/best.pt \
+  --input texts.csv --output predictions.jsonl
+uv run text-classify compare-runs artifacts/run-a artifacts/run-b
+```
+
+正常训练会保存最终配置、tokenizer、`best.pt`、`last.pt`、逐轮指标和运行身份。训练 checkpoint 基于 Python pickle，只加载你信任的文件；对外推理分发可用 `export-inference` 转为 `.safetensors`。
 
 ## 在 Kaggle 训练
 
@@ -73,7 +81,7 @@ runner 会自动下载代码和 AG News、准备 manifest、dry run、CUDA 训�
 
 ## 文档
 
-从[文档首页](docs/README.zh-CN.md)按目标进入：
+从[文档首页](docs/README.zh-CN.md)按目标进入；启用 GitHub Pages 后，同一 Markdown 由 MkDocs 发布到 `https://doithoo.github.io/pytorch-text-classification-lab/`：
 
 - [教程](docs/tutorial/README.zh-CN.md)：基础、环境、数据、模型、训练、评估与推理。
 - [概念](docs/concepts/classification-flow.zh-CN.md)：完整数据流、代码导览和配置合并。

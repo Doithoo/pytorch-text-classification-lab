@@ -211,7 +211,7 @@ def _validate_resume_config(config: dict[str, Any], checkpoint: dict[str, Any]) 
     previous = checkpoint["config"]
     if config["model"] != previous["model"]:
         raise ValueError("resume requires the same model configuration as the checkpoint")
-    for key in ("name", "tokenizer", "vocab_size", "min_frequency", "max_length"):
+    for key in ("name", "tokenizer", "text_column", "label_column", "vocab_size", "min_frequency", "max_length"):
         if config["data"][key] != previous["data"][key]:
             raise ValueError(f"resume requires unchanged data.{key}")
     for key in ("optimizer", "lr", "weight_decay", "momentum", "best_metric"):

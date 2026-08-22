@@ -12,4 +12,4 @@ Published run:
 
 A run retains exact git revision, resolved config, source and manifest identity, tokenizer, epoch metrics, Kaggle GPU/PyTorch/CUDA/Python, test metrics, and high-confidence errors. The 93 MB checkpoints remain in Kaggle output instead of Git.
 
-`kaggle/` is a resubmittable runner, not a run result. Add a separate directory for new results and do not replace historical evidence. Never describe dry-run or sample-limited results as a full benchmark.
+`kaggle/` is the resubmittable single-model runner and `kaggle-comparison/` is a three-model runner with no published result yet; neither is completed-run evidence. Add a separate directory for new results and do not replace historical evidence. Never describe dry-run, sample-limited, or pending configurations as a full benchmark.

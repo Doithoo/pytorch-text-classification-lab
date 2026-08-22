@@ -6,10 +6,12 @@ include CONTRIBUTING.zh-CN.md
 include SECURITY.md
 include CITATION.cff
 include Makefile
+include mkdocs.yml
 recursive-include configs *.yaml *.md
 recursive-include docs *.md *.png
 recursive-include docs/recorded-run *.csv *.yaml
 recursive-include docs/recorded-run/kaggle *.py *.json
+recursive-include docs/recorded-run/kaggle-comparison *.py *.json
 include docs/recorded-run/kaggle-agnews-textcnn/run.json
 include docs/recorded-run/kaggle-agnews-textcnn/kaggle-run-summary.json
 include docs/recorded-run/kaggle-agnews-textcnn/evaluation/metrics.json

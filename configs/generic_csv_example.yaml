@@ -1,0 +1,36 @@
+data:
+  name: generic_csv
+  data_dir: data/custom
+  manifest_dir: data/custom-manifests
+  tokenizer: simple_word
+  text_column: text
+  label_column: label
+  vocab_size: 20000
+  min_frequency: 1
+  max_length: 128
+  valid_ratio: 0.1
+  num_workers: 0
+  max_train_samples: null
+  max_valid_samples: null
+  max_test_samples: null
+model:
+  name: text_cnn
+  embedding_dim: 128
+  hidden_dim: 96
+  dropout: 0.2
+  kernel_sizes: [3, 4, 5]
+train:
+  epochs: 5
+  batch_size: 64
+  lr: 0.001
+  weight_decay: 0.0001
+  optimizer: adamw
+  momentum: 0.9
+  seed: 42
+  amp: false
+  deterministic: false
+  grad_clip: 1.0
+  best_metric: macro_f1
+device: auto
+output_dir: artifacts
+run_name: generic-csv-example

@@ -2,16 +2,36 @@
 
 [中文](using-your-data.zh-CN.md) | [Documentation index](../README.md)
 
-The current release officially supports only the three-column AG News CSV and its fixed four labels. Renaming custom files to `train.csv` and `test.csv` is not general compatibility: the parser interprets the first column as 1-4, and label names and prediction follow the AG News protocol.
-
-A temporary no-code experiment must use:
+The `generic_csv` adapter supports arbitrary binary or multiclass tasks. Prepare two UTF-8 CSV files with headers:
 
 ```text
-<label 1..4>,<title>,<description>
+data/custom/train.csv
+data/custom/test.csv
 ```
 
-under `<data_dir>/ag_news_csv/`. This is only suitable for structurally compatible four-class experiments. Generated metadata still identifies `ag_news`, so do not publish it as generic custom-data support.
+Default columns are `text,label`:
 
-A real dataset addition needs an adapter defining provenance and license, raw schema, label order, stable sample IDs, train/valid/test policy, duplicate handling, hash identity, and class count. Then remove AG News assumptions from training and inference and version the adapter in manifest metadata.
+```csv
+text,label
+The team won the final,sports
+Shares rose after earnings,business
+```
 
-Do not commit private or raw data. Error files retain complete text, so review privacy, copyright, and dataset terms before publication.
+Each training label needs at least two rows so validation can be sampled per class. Every test label must exist in training. Labels are deduplicated and sorted deterministically, then stored in `dataset.json` and checkpoints.
+
+```bash
+uv run text-classify prepare-data --config configs/generic_csv_example.yaml
+uv run text-classify inspect-data --config configs/generic_csv_example.yaml
+uv run text-classify train --config configs/generic_csv_example.yaml --dry-run --set device=cpu
+```
+
+Override different column names:
+
+```bash
+uv run text-classify prepare-data --config configs/generic_csv_example.yaml \
+  --set data.text_column=body --set data.label_column=category
+```
+
+Besides terminal summaries, `inspect-data` writes `inspection.json` with label counts, duplicate IDs, within-split duplicates, cross-split text leakage, conflicting labels, lengths, truncation, vocabulary size, and OOV ratios. Resolve leakage and label conflicts before comparing models.
+
+The adapter currently requires labeled train/test and derives valid from train. It does not support multilabel, unlabeled prediction datasets, hierarchical labels, or streaming data. Do not commit raw private text. Error and batch-prediction files retain text, so review privacy, copyright, and licensing before publication.

@@ -29,6 +29,8 @@ jobs:
       - run: uv run pre-commit run --all-files
         if: matrix.python-version == '3.10'
       - run: uv run pytest -W error::DeprecationWarning
+      - run: uv run mkdocs build --strict
+        if: matrix.python-version == '3.10'
       - run: |
           uv run text-classify --version
           uv run text-classify list-models

@@ -1,0 +1,90 @@
+site_name: PyTorch Text Classification Lab
+site_description: Reproducible, beginner-oriented PyTorch text classification
+repo_url: https://github.com/Doithoo/pytorch-text-classification-lab
+repo_name: Doithoo/pytorch-text-classification-lab
+docs_dir: docs
+site_dir: build/site
+strict: true
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+nav:
+  - Home: README.md
+  - 中文首页: README.zh-CN.md
+  - Tutorial:
+      - Overview: tutorial/README.md
+      - Basics: tutorial/00-basics.md
+      - Environment: tutorial/01-environment.md
+      - Data and tokens: tutorial/02-data-and-tokens.md
+      - Models: tutorial/03-models.md
+      - Training: tutorial/04-training.md
+      - Evaluation and inference: tutorial/05-evaluation-and-inference.md
+  - 中文教程:
+      - 导航: tutorial/README.zh-CN.md
+      - 基础: tutorial/00-basics.zh-CN.md
+      - 环境: tutorial/01-environment.zh-CN.md
+      - 数据与 token: tutorial/02-data-and-tokens.zh-CN.md
+      - 模型: tutorial/03-models.zh-CN.md
+      - 训练: tutorial/04-training.zh-CN.md
+      - 评估与推理: tutorial/05-evaluation-and-inference.zh-CN.md
+  - Concepts:
+      - Classification flow: concepts/classification-flow.md
+      - Code tour: concepts/code-tour.md
+      - Configuration flow: concepts/configuration-flow.md
+  - 中文概念:
+      - 分类流程: concepts/classification-flow.zh-CN.md
+      - 代码导览: concepts/code-tour.zh-CN.md
+      - 配置流: concepts/configuration-flow.zh-CN.md
+  - Guides:
+      - Choosing models: guides/choosing-models.md
+      - Using your data: guides/using-your-data.md
+      - Experiments: guides/experiments.md
+      - Kaggle: guides/kaggle.md
+      - Troubleshooting: guides/troubleshooting.md
+      - Adding models: guides/adding-models.md
+  - 中文指南:
+      - 模型选择: guides/choosing-models.zh-CN.md
+      - 使用自己的数据: guides/using-your-data.zh-CN.md
+      - 实验比较: guides/experiments.zh-CN.md
+      - Kaggle: guides/kaggle.zh-CN.md
+      - 排错: guides/troubleshooting.zh-CN.md
+      - 添加模型: guides/adding-models.zh-CN.md
+  - Reference:
+      - Configuration: reference/config-reference.md
+      - Dataset format: reference/dataset-format.md
+      - Metrics: reference/metrics.md
+      - Checkpoint schema: reference/checkpoint-schema.md
+      - CLI and outputs: reference/cli-and-outputs.md
+      - Model catalog: reference/model-zoo.md
+      - AG News: reference/ag-news.md
+  - 中文参考:
+      - 配置: reference/config-reference.zh-CN.md
+      - 数据格式: reference/dataset-format.zh-CN.md
+      - 指标: reference/metrics.zh-CN.md
+      - Checkpoint: reference/checkpoint-schema.zh-CN.md
+      - CLI 与输出: reference/cli-and-outputs.zh-CN.md
+      - 模型清单: reference/model-zoo.zh-CN.md
+      - AG News: reference/ag-news.zh-CN.md
+  - Architecture:
+      - Reproducible contracts: architecture/0001-reproducible-text-classification-contracts.md
+      - Generic CSV contract: architecture/0002-generic-csv-dataset-contract.md
+  - 中文架构:
+      - 可复现实验契约: architecture/0001-reproducible-text-classification-contracts.zh-CN.md
+      - 通用 CSV 协议: architecture/0002-generic-csv-dataset-contract.zh-CN.md
+  - Recorded runs:
+      - Index: recorded-run/README.md
+      - TextCNN result: recorded-run/kaggle-agnews-textcnn/README.md
+      - Comparison runner: recorded-run/kaggle-comparison/README.md
+  - 中文运行记录:
+      - 索引: recorded-run/README.zh-CN.md
+      - TextCNN 结果: recorded-run/kaggle-agnews-textcnn/README.zh-CN.md
+      - 三模型 Runner: recorded-run/kaggle-comparison/README.zh-CN.md
+markdown_extensions:
+  - tables
+  - fenced_code
+  - toc:
+      permalink: true

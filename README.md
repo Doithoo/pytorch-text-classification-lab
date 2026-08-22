@@ -6,13 +6,13 @@
 
 **中文: [README.zh-CN.md](README.zh-CN.md)**
 
-A beginner-oriented PyTorch project that makes text-classification experiments reproducible. AG News is the fixed task used to explain download, stratified manifests, a training-only vocabulary, dynamic padding, classic models, GPU training, evaluation, error analysis, and checkpoint resume.
+A beginner-oriented PyTorch project that makes text-classification experiments reproducible. AG News is the reference task, while headered generic CSV supports arbitrary binary and multiclass data. The project covers preparation, auditing, stratified manifests, a training-only vocabulary, dynamic padding, classic models, GPU training, evaluation, error analysis, and checkpoint resume.
 
 ```text
 download -> prepare -> inspect -> dry run -> train -> evaluate -> predict
 ```
 
-The built-in models are `embedding_bag`, `text_cnn`, and `bilstm`. The current scope deliberately excludes arbitrary datasets, pretrained Transformers, and production serving.
+The built-in models are `embedding_bag`, `text_cnn`, and `bilstm`, with `ag_news` and `generic_csv` data adapters. Scope is single-label classic text classification; multilabel data, pretrained Transformers, and production serving remain excluded.
 
 ## Recorded Kaggle result
 
@@ -57,7 +57,15 @@ uv run text-classify predict --checkpoint artifacts/first-run/best.pt \
   --text "Stocks rose after the company reported strong earnings." --top-k 3
 ```
 
-A normal run stores the resolved config, tokenizer, `best.pt`, `last.pt`, epoch metrics, and run identity. PyTorch checkpoints use Python pickle internally; load only files you trust.
+For your own headered `text,label` CSV, start with the [custom-data guide](docs/guides/using-your-data.md) and `configs/generic_csv_example.yaml`. `inspect-data` writes `inspection.json` with duplicates, cross-split leakage, label conflicts, truncation, and OOV. Batch inference and experiment comparison use:
+
+```bash
+uv run text-classify predict-file --checkpoint artifacts/first-run/best.pt \
+  --input texts.csv --output predictions.jsonl
+uv run text-classify compare-runs artifacts/run-a artifacts/run-b
+```
+
+A normal run stores the resolved config, tokenizer, `best.pt`, `last.pt`, epoch metrics, and run identity. Training checkpoints use Python pickle and must be trusted; use `export-inference` to create `.safetensors` for distribution.
 
 ## Kaggle training
 
@@ -73,7 +81,7 @@ The runner downloads the repository and AG News, prepares manifests, performs a 
 
 ## Documentation
 
-Use the [documentation index](docs/README.md) to choose a path:
+Use the [documentation index](docs/README.md) to choose a path. Once GitHub Pages is enabled, the same Markdown is published by MkDocs at `https://doithoo.github.io/pytorch-text-classification-lab/`:
 
 - [Tutorial](docs/tutorial/README.md): basics, environment, data, models, training, evaluation, and inference.
 - [Concepts](docs/concepts/classification-flow.md): data flow, code tour, and configuration flow.

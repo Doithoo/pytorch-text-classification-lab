@@ -1,6 +1,6 @@
 PYTHON := uv run python
 
-.PHONY: sync lint format type test check build docs-assets
+.PHONY: sync lint format type test check build docs docs-assets
 
 sync:
 	uv sync --locked --extra dev
@@ -23,6 +23,9 @@ check: lint type test
 build:
 	uv build
 	uv run twine check dist/*
+
+docs:
+	uv run mkdocs build --strict
 
 docs-assets:
 	uv run --extra plot $(PYTHON) scripts/generate_doc_assets.py --run-dir docs/recorded-run/kaggle-agnews-textcnn

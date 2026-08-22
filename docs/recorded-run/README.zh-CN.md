@@ -12,4 +12,4 @@
 
 运行目录保留精确 git revision、解析配置、源与 manifest identity、tokenizer、逐轮 metrics、Kaggle GPU/PyTorch/CUDA/Python、测试指标和高置信度错误。93 MB checkpoint 由 Kaggle 输出提供，不提交 Git。
 
-`kaggle/` 是可重新提交的 runner，不是一次运行结果。发布新结果时创建独立目录，不覆盖历史证据；不要把 dry run 或小样本结果描述为完整基准。
+`kaggle/` 是可重新提交的单模型 runner，`kaggle-comparison/` 是尚未产生发布成绩的三模型 runner；两者都不是完成运行的证据。发布新结果时创建独立目录，不覆盖历史证据；不要把 dry run、小样本或待运行配置描述为完整基准。

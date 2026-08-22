@@ -53,6 +53,16 @@ text-classify train --config configs/reference_textcnn.yaml \
 
 不要从不可信来源加载 checkpoint。续训会验证 manifest、模型、tokenizer 和优化器关键参数。
 
+## 三模型对比
+
+`docs/recorded-run/kaggle-comparison/` 提供当前代码的 EmbeddingBag、TextCNN、BiLSTM 同 manifest runner：
+
+```bash
+kaggle kernels push -p docs/recorded-run/kaggle-comparison
+```
+
+它会生成三个运行目录和经过 identity 校验的 `comparison.json`。该 runner 尚未完成真实运行，因此文档不声明新成绩。
+
 ## 发布结果
 
 先用验证集选择设置，再评估一次测试集。发布页面应给出精确 git revision、数据和 manifest identity、最终配置、依赖环境、GPU、墙钟时间、完整指标和错误分析，不发布估算数字。

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -5,7 +6,7 @@ import torch
 
 from text_classifier.config import load_config
 from text_classifier.data.tokenizer import SimpleWordTokenizer
-from text_classifier.inference import predict_text
+from text_classifier.inference import export_inference_checkpoint, predict_text
 from text_classifier.models import build_model
 from text_classifier.training.checkpoint import load_checkpoint
 
@@ -40,6 +41,23 @@ def test_predict_text_accepts_one_word_textcnn_input(tmp_path: Path) -> None:
     assert result["label"] in {"world", "sports", "business", "sci_tech"}
     assert len(result["top_predictions"]) == 2
     assert set(result["probabilities"]) == {"world", "sports", "business", "sci_tech"}
+
+
+def test_safe_inference_export_round_trip(tmp_path: Path) -> None:
+    checkpoint = tmp_path / "model.pt"
+    _write_checkpoint(checkpoint)
+    expected = predict_text(checkpoint, "hello", top_k=2)
+    weights, metadata = export_inference_checkpoint(checkpoint, tmp_path / "model.safetensors")
+    assert weights.is_file()
+    assert metadata.is_file()
+    actual = predict_text(weights, "hello", top_k=2)
+    assert actual["label"] == expected["label"]
+    assert actual["probabilities"] == pytest.approx(expected["probabilities"])
+    sidecar = json.loads(metadata.read_text(encoding="utf-8"))
+    sidecar["weights_sha256"] = "0" * 64
+    metadata.write_text(json.dumps(sidecar), encoding="utf-8")
+    with pytest.raises(ValueError, match="SHA-256"):
+        predict_text(weights, "hello")
 
 
 def test_checkpoint_schema_is_validated(tmp_path: Path) -> None:

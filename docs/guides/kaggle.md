@@ -53,6 +53,16 @@ text-classify train --config configs/reference_textcnn.yaml \
 
 Never load an untrusted checkpoint. Resume validates manifest, model, tokenizer, and important optimizer settings.
 
+## Three-model comparison
+
+`docs/recorded-run/kaggle-comparison/` provides a current-code runner for EmbeddingBag, TextCNN, and BiLSTM on one manifest:
+
+```bash
+kaggle kernels push -p docs/recorded-run/kaggle-comparison
+```
+
+It writes three run directories and identity-validated `comparison.json`. The runner has not completed a real run, so documentation claims no new score.
+
 ## Publish a result
 
 Select settings on validation, then evaluate test once. A publication page should include exact git revision, dataset and manifest identity, resolved config, dependency environment, GPU, wall time, full metrics, and errors. Do not publish estimated metrics.

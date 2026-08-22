@@ -12,10 +12,10 @@ Beginner projects often combine data download, random splitting, vocabulary, tra
 
 The project uses explicit auditable boundaries: raw data is not committed; preparation writes SHA-256 identified manifests; vocabulary comes only from training; configuration is fully resolved and validated before training; training reads train/valid only; checkpoints contain model, optimizer, tokenizer, labels, and manifest identity; test evaluation writes split-specific non-overwriting evidence; recorded results include environment and errors.
 
-The first scope supports only AG News, a simple word tokenizer, and three classic models. Configuration does not pretend to support unimplemented datasets or Transformers.
+The initial release supported only AG News, a simple word tokenizer, and three classic models. Version 0.3.0 adds the generic CSV adapter under ADR 0002 while continuing to reject unimplemented multilabel and Transformer configuration.
 
 ## Consequences
 
 Experiments are easier to compare and audit, and tests can enforce CLI and file contracts. The cost is more manifest, metadata, and documentation maintenance. Label, checkpoint, or config schema changes require an explicit compatibility policy.
 
-Future datasets and pretrained models should extend registries and schemas instead of adding implicit branches to the AG News path.
+Future adapters and pretrained models should extend explicit adapter/registry and schema contracts instead of adding implicit branches to the AG News path.

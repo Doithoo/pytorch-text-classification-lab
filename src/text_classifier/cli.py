@@ -11,10 +11,11 @@ from torch.utils.data import DataLoader
 from . import __version__
 from .config import load_config, show_config
 from .data.dataset import TextClassificationDataset, make_collate_fn
-from .data.manifest import load_manifest, load_manifest_metadata, manifest_identity, prepare_data
+from .data.manifest import audit_manifests, load_manifest, load_manifest_metadata, manifest_identity, prepare_data
 from .data.tokenizer import SimpleWordTokenizer
+from .evaluation.compare import compare_runs
 from .evaluation.metrics import save_json
-from .inference import predict_text
+from .inference import export_inference_checkpoint, predict_file, predict_text
 from .models import build_model, list_models
 from .training.checkpoint import load_checkpoint
 from .training.train import evaluate_loader, resolve_device, train
@@ -32,6 +33,9 @@ def cmd_prepare(args: argparse.Namespace) -> None:
         config["data"]["manifest_dir"],
         float(config["data"]["valid_ratio"]),
         int(config["train"]["seed"]),
+        str(config["data"]["name"]),
+        str(config["data"]["text_column"]),
+        str(config["data"]["label_column"]),
     )
     print(json.dumps(metadata, indent=2))
 
@@ -58,6 +62,15 @@ def cmd_inspect(args: argparse.Namespace) -> None:
             f"p95={_percentile(lengths, 0.95)} max={max(lengths)} "
             f"truncated={truncated} labels={dict(sorted(labels.items()))}"
         )
+    audit = audit_manifests(
+        manifest_dir,
+        max_length,
+        int(config["data"]["vocab_size"]),
+        int(config["data"]["min_frequency"]),
+    )
+    output = Path(args.output) if args.output else manifest_dir / "inspection.json"
+    save_json(output, audit)
+    print(f"audit: {output}")
 
 
 def cmd_evaluate(args: argparse.Namespace) -> None:
@@ -105,17 +118,36 @@ def cmd_predict(args: argparse.Namespace) -> None:
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
+def cmd_predict_file(args: argparse.Namespace) -> None:
+    count = predict_file(args.checkpoint, args.input, args.output, args.device, args.top_k, args.overwrite)
+    print(json.dumps({"input": str(args.input), "output": str(args.output), "predictions": count}, indent=2))
+
+
+def cmd_export_inference(args: argparse.Namespace) -> None:
+    weights, metadata = export_inference_checkpoint(args.checkpoint, args.output, args.overwrite)
+    print(json.dumps({"weights": str(weights), "metadata": str(metadata)}, indent=2))
+
+
+def cmd_compare(args: argparse.Namespace) -> None:
+    rows = compare_runs(args.runs, args.metric)
+    if args.output:
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    print(json.dumps(rows, indent=2))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="text-classify")
     parser.add_argument("--version", action="version", version=__version__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    for name, handler, help_text in [
-        ("prepare-data", cmd_prepare, "create audited train/valid/test manifests"),
-        ("inspect-data", cmd_inspect, "inspect prepared text lengths and labels"),
-    ]:
-        sub = subparsers.add_parser(name, help=help_text)
-        _config_parser(sub)
-        sub.set_defaults(handler=handler)
+    prepare_parser = subparsers.add_parser("prepare-data", help="create audited train/valid/test manifests")
+    _config_parser(prepare_parser)
+    prepare_parser.set_defaults(handler=cmd_prepare)
+    inspect_parser = subparsers.add_parser("inspect-data", help="inspect and audit prepared text")
+    _config_parser(inspect_parser)
+    inspect_parser.add_argument("--output", type=Path, default=None)
+    inspect_parser.set_defaults(handler=cmd_inspect)
 
     train_parser = subparsers.add_parser("train", help="train a classifier")
     _config_parser(train_parser)
@@ -142,6 +174,27 @@ def build_parser() -> argparse.ArgumentParser:
     predict_parser.add_argument("--device", default="cpu")
     predict_parser.add_argument("--top-k", type=int, default=3)
     predict_parser.set_defaults(handler=cmd_predict)
+
+    batch_parser = subparsers.add_parser("predict-file", help="classify texts from CSV or JSONL")
+    batch_parser.add_argument("--checkpoint", type=Path, required=True)
+    batch_parser.add_argument("--input", type=Path, required=True)
+    batch_parser.add_argument("--output", type=Path, required=True)
+    batch_parser.add_argument("--device", default="cpu")
+    batch_parser.add_argument("--top-k", type=int, default=3)
+    batch_parser.add_argument("--overwrite", action="store_true")
+    batch_parser.set_defaults(handler=cmd_predict_file)
+
+    export_parser = subparsers.add_parser("export-inference", help="export trusted .pt to safe inference files")
+    export_parser.add_argument("--checkpoint", type=Path, required=True)
+    export_parser.add_argument("--output", type=Path, required=True)
+    export_parser.add_argument("--overwrite", action="store_true")
+    export_parser.set_defaults(handler=cmd_export_inference)
+
+    compare_parser = subparsers.add_parser("compare-runs", help="compare compatible training runs")
+    compare_parser.add_argument("runs", nargs="+", type=Path)
+    compare_parser.add_argument("--metric", default="valid_macro_f1")
+    compare_parser.add_argument("--output", type=Path, default=None)
+    compare_parser.set_defaults(handler=cmd_compare)
 
     config_parser = subparsers.add_parser("show-config", help="print and validate resolved configuration")
     _config_parser(config_parser)

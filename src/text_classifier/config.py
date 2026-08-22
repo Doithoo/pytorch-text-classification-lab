@@ -14,6 +14,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "data_dir": "data/raw",
         "manifest_dir": "data/manifests",
         "tokenizer": "simple_word",
+        "text_column": "text",
+        "label_column": "label",
         "vocab_size": 30000,
         "min_frequency": 2,
         "max_length": 128,
@@ -139,14 +141,20 @@ def validate_config(config: dict[str, Any]) -> dict[str, Any]:
     _reject_unknown(model, _MODEL_KEYS, "model")
     _reject_unknown(train, _TRAIN_KEYS, "train")
 
-    if data.get("name") != "ag_news":
-        raise ValueError("data.name must be ag_news")
+    if data.get("name") not in {"ag_news", "generic_csv"}:
+        raise ValueError("data.name must be ag_news or generic_csv")
     if data.get("tokenizer") != "simple_word":
         raise ValueError("data.tokenizer must be simple_word")
     if not isinstance(data.get("data_dir"), str) or not data["data_dir"]:
         raise ValueError("data.data_dir must be a non-empty path string")
     if not isinstance(data.get("manifest_dir"), str) or not data["manifest_dir"]:
         raise ValueError("data.manifest_dir must be a non-empty path string")
+    if not isinstance(data.get("text_column"), str) or not data["text_column"]:
+        raise ValueError("data.text_column must be a non-empty string")
+    if not isinstance(data.get("label_column"), str) or not data["label_column"]:
+        raise ValueError("data.label_column must be a non-empty string")
+    if data["name"] == "generic_csv" and data["text_column"] == data["label_column"]:
+        raise ValueError("data.text_column and data.label_column must differ")
     _require_int(data, "vocab_size", 4)
     _require_int(data, "min_frequency")
     max_length = _require_int(data, "max_length", 2)

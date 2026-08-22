@@ -7,11 +7,11 @@
 ```text
 config.py               配置合并与校验
 cli.py                  text-classify 命令入口
-data/                    manifest、tokenizer、Dataset、collate
+data/                    AG News/generic CSV adapter、manifest、审计、tokenizer、Dataset
 models/                  三个分类器和注册表
 training/                训练循环、checkpoint、运行 metadata
-evaluation/              分类指标
-inference/               可信 checkpoint 单文本预测
+evaluation/              分类指标和兼容运行比较
+inference/               可信 checkpoint 单文本与文件批量预测
 ```
 
 模块间依赖方向是 CLI -> data/model/training/evaluation/inference；底层模块不应导入 CLI。训练和推理共享模型、tokenizer 和 checkpoint 协议，不复制反序列化逻辑。

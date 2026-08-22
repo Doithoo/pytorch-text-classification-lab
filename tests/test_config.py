@@ -28,12 +28,19 @@ def test_merge_does_not_mutate_input() -> None:
         ("train.batch_size=0", "batch_size"),
         ("train.lr=.inf", "lr"),
         ("model.dropout=1", "dropout"),
+        ("data.name=unknown", "data.name"),
         ("unknown.value=1", "unknown configuration"),
     ],
 )
 def test_invalid_config_is_rejected(override: str, message: str) -> None:
     with pytest.raises(ValueError, match=message):
         load_config(None, [override])
+
+
+def test_generic_csv_config_is_supported() -> None:
+    config = load_config(None, ["data.name=generic_csv", "data.text_column=body", "data.label_column=category"])
+    assert config["data"]["name"] == "generic_csv"
+    assert config["data"]["text_column"] == "body"
 
 
 def test_run_name_cannot_escape_output_directory() -> None:

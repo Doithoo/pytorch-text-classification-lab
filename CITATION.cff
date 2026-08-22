@@ -7,7 +7,7 @@ authors:
 repository-code: "https://github.com/Doithoo/pytorch-text-classification-lab"
 url: "https://github.com/Doithoo/pytorch-text-classification-lab"
 license: MIT
-version: 0.2.0
+version: 0.3.0
 date-released: 2026-08-22
 references:
   - type: conference-paper

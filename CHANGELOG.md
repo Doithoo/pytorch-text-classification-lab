@@ -2,6 +2,25 @@
 
 All notable changes are documented here. The project follows semantic versioning while its public CLI and file contracts stabilize.
 
+## 0.3.0 - 2026-08-22
+
+### Added
+
+- `generic_csv` adapter for arbitrary binary and multiclass headered CSV datasets.
+- Manifest audit evidence for duplicate IDs/text, cross-split leakage, conflicting labels, truncation, and tokenizer OOV.
+- Reusable batch CSV/JSONL prediction through `predict-file`.
+- Safe inference export to `.safetensors` plus JSON metadata, directly loadable by prediction commands.
+- Identity-validated run comparison through `compare-runs`.
+- Full-data EmbeddingBag config and a pending Kaggle three-model comparison runner.
+- MkDocs Material site, strict documentation build, GitHub Pages deployment, and tag release workflow.
+- Generic CSV architecture decision, configuration, documentation, and end-to-end tests.
+
+### Changed
+
+- Training, checkpoint, evaluation, and prediction derive class count and label order from dataset metadata.
+- `inspect-data` now writes machine-readable `inspection.json` in addition to terminal summaries.
+- Resume compatibility includes dataset adapter column names.
+
 ## 0.2.0 - 2026-08-22
 
 ### Added

@@ -2,17 +2,17 @@
 
 [English](experiments.md) | [文档首页](../README.zh-CN.md)
 
-一个可比较实验必须先写清问题，例如“在相同词表和训练预算下，TextCNN 是否比 EmbeddingBag 提高验证 macro-F1”。每次只改变一个主要因素，并使用不同 `run_name`：
+先写清可证伪问题，例如“相同 manifest、词表和训练预算下，TextCNN 是否比 EmbeddingBag 提高验证 macro-F1”。每次只改变一个主要因素并使用独立 `run_name`。
 
 ```bash
-uv run text-classify train --config configs/learning_minimal.yaml \
-  --set run_name=baseline --set model.name=embedding_bag
-uv run text-classify train --config configs/learning_minimal.yaml \
-  --set run_name=textcnn --set model.name=text_cnn
+uv run text-classify train --config configs/reference_embedding_bag.yaml
+uv run text-classify train --config configs/reference_textcnn.yaml
+uv run text-classify compare-runs artifacts/kaggle-agnews-embedding-bag \
+  artifacts/kaggle-agnews-textcnn --output artifacts/comparison.json
 ```
 
-在运行前保存 `show-config` 输出，确认 manifest、seed、数据上限、epoch、batch size、学习率和 optimizer 一致。上例只适合流程演示；正式比较应确认 TextCNN kernel 与 max length 合法，并使用足够数据。
+`compare-runs` 先检查 `manifest_identity`、`tokenizer_sha256` 和 `label_names`，再从每个 `metrics.csv` 选择指定验证指标的最佳 epoch，并记录 git revision 和耗时。协议不兼容时命令失败，而不是只把最高数字放在一起。
 
-比较 `metrics.csv` 的最佳验证指标和 `run.json` 的耗时、代码 revision、配置/tokenizer/manifest 哈希。模型选择完成后，才分别评估同一个 test manifest。报告负结果和异常运行，不要只保留最高数字。
+运行前用 `show-config` 确认 seed、数据上限、epoch、batch size、学习率和 optimizer。比较模型时允许模型结构不同，但 tokenizer 和 manifest 应一致。先使用验证指标选择设置，模型选择完成后再分别评估同一个 test manifest。
 
-当前没有自动聚合命令，避免不同协议被静默合并。可使用 pandas 或电子表格显式整理；未来增加 `compare-runs` 时必须先验证 identity 和指标 schema。
+Kaggle 三模型 runner 位于 `docs/recorded-run/kaggle-comparison/`。它尚未执行，因此没有可发布的新成绩。完成后应保留三个运行目录、comparison、精确 revision 和失败记录，不只发布获胜模型。

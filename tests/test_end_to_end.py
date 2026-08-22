@@ -7,6 +7,7 @@ import pytest
 from text_classifier.cli import main
 from text_classifier.config import load_config
 from text_classifier.data.manifest import prepare_data
+from text_classifier.training.checkpoint import load_checkpoint
 from text_classifier.training.train import train
 
 
@@ -18,12 +19,51 @@ def _write_ag(path: Path, rows: int) -> None:
             writer.writerow([(index % 4) + 1, f"title {index}", f"description {index}"])
 
 
+def test_generic_csv_three_class_training(tmp_path: Path) -> None:
+    raw = tmp_path / "generic"
+    raw.mkdir()
+    with (raw / "train.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["text", "label"])
+        for label in ("alpha", "beta", "gamma"):
+            for index in range(6):
+                writer.writerow([f"{label} example {index}", label])
+    with (raw / "test.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["text", "label"])
+        for label in ("alpha", "beta", "gamma"):
+            writer.writerow([f"{label} held out", label])
+    manifests = tmp_path / "generic-manifests"
+    prepare_data(raw, manifests, valid_ratio=0.25, seed=3, dataset_name="generic_csv")
+    config = load_config(
+        None,
+        [
+            "data.name=generic_csv",
+            f"data.data_dir={raw}",
+            f"data.manifest_dir={manifests}",
+            "data.min_frequency=1",
+            "train.epochs=1",
+            "train.batch_size=3",
+            "model.name=embedding_bag",
+            "device=cpu",
+            f"output_dir={tmp_path / 'artifacts'}",
+            "run_name=generic-run",
+        ],
+    )
+    run_dir = train(config)
+    assert run_dir is not None
+    payload = load_checkpoint(run_dir / "best.pt")
+    assert payload["label_names"] == ["alpha", "beta", "gamma"]
+
+
 def test_cpu_dry_run(tmp_path: Path) -> None:
     raw = tmp_path / "raw" / "ag_news_csv"
     _write_ag(raw / "train.csv", 40)
     _write_ag(raw / "test.csv", 16)
     manifests = tmp_path / "manifests"
     prepare_data(raw.parent, manifests, valid_ratio=0.2, seed=42)
+    main(["inspect-data", "--set", f"data.manifest_dir={manifests}"])
+    assert (manifests / "inspection.json").exists()
     config = load_config(
         None,
         [

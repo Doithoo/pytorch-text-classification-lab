@@ -2,24 +2,21 @@
 
 [English](dataset-format.md) | [文档首页](../README.zh-CN.md)
 
-原始 AG News 文件位于：
+项目有两个原始数据 adapter，但产出同一个 manifest 协议。
 
-```text
-<data_dir>/ag_news_csv/train.csv
-<data_dir>/ag_news_csv/test.csv
-```
+AG News 位于 `<data_dir>/ag_news_csv/{train,test}.csv`，每行是无表头 `label,title,description`。`generic_csv` 位于 `<data_dir>/{train,test}.csv`，要求表头；正文和标签字段默认 `text,label`，可由配置修改。
 
-每行由 CSV 解析器读取为 `label,title,description`。引号、逗号和换行必须符合标准 CSV，不能用简单字符串切分。
-
-准备后的三个 manifest 使用相同 schema：
+准备后的三个 manifest 字段固定：
 
 | 字段 | 类型 | 含义 |
 | --- | --- | --- |
-| `id` | string | `train-000000` 或 `test-000000` 稳定源行 ID |
-| `text` | string | title 与 description 拼接文本 |
-| `label` | string | world、sports、business、sci_tech |
-| `label_id` | integer | 按上面顺序的 0-3 |
+| `id` | string | adapter 生成的稳定 split 行 ID |
+| `text` | string | 模型输入正文 |
+| `label` | string | 原始标签名称 |
+| `label_id` | integer | `dataset.json.labels` 中的索引 |
 
-`dataset.json` 的 `schema_version=1`，保存 dataset 名称、标签顺序、seed、valid ratio、各 split 数量、源文件 SHA-256 和 manifest SHA-256。manifest identity 是该 JSON 规范化排序后内容的 SHA-256；checkpoint 保存它并在续训和评估时比较。
+`dataset.json` 使用 `schema_version=1`，保存 dataset/adapter、通用 CSV 列名、标签顺序、seed、valid ratio、split 数量、源 SHA-256 和 manifest SHA-256。manifest identity 是该 metadata 按键排序序列化后的 SHA-256。
 
-当前划分按类别分别 shuffle 和抽取验证集，再按稳定 ID 排序。相同源文件、seed 和 valid ratio 会得到相同 manifest。修改任何源内容、划分参数或标签协议都应产生新的 identity。
+通用 CSV 标签从训练集去重并按字符串排序。训练每类至少两条，测试不能出现训练外标签。valid 从训练集按类随机抽取后恢复稳定 ID 顺序。
+
+`inspection.json` 不是 identity 的组成部分，而是派生审计证据，记录重复 ID、split 内重复、跨 split 归一化文本交集、冲突标签、长度/截断和 tokenizer OOV。修改源内容、adapter、列名、标签或划分参数会改变 identity；修改审计展示不会。

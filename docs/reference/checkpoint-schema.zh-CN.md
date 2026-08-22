@@ -18,6 +18,16 @@
 
 加载器会检查文件存在、mapping、schema、必要字段、配置和 tokenizer 基本结构。旧 v1 配置缺少后来新增的默认字段时会补全默认值。
 
-`best.pt` 用于评估和推理；`last.pt` 用于恢复中断训练。不要只保存权重而丢失 config、tokenizer 和 manifest metadata。
+`best.pt` 用于评估和续训相关验证，`last.pt` 用于恢复中断训练。两者使用 pickle，只加载可信来源。需要分发纯推理模型时转换为安全权重：
+
+```bash
+uv sync --extra safe
+uv run text-classify export-inference --checkpoint artifacts/run/best.pt \
+  --output artifacts/run/model.safetensors
+```
+
+导出产生 `.safetensors` 权重和 `.safetensors.json` sidecar；JSON 保存模型配置、tokenizer、标签、manifest identity 和权重 SHA-256，不包含优化器或可执行 pickle。加载时会校验权重哈希。`predict` 与 `predict-file` 可直接加载 `.safetensors`。
+
+不要只保存训练权重而丢失 config、tokenizer 和 manifest metadata。
 
 `torch.load(weights_only=False)` 使用 pickle，恶意文件可能执行代码。只加载由自己或可信项目运行生成的 checkpoint，不把上传的任意 `.pt` 当普通数据处理。schema 校验发生在反序列化之后，不能防止 pickle 执行。
