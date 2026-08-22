@@ -30,7 +30,7 @@ The published TextCNN run trained for eight epochs on a Kaggle Tesla T4. The tes
 
 ![AG News TextCNN test confusion matrix](docs/assets/ag-news-textcnn-confusion.png)
 
-This is a bounded recorded run, not a general benchmark. Its config, tokenizer, epoch metrics, environment, confusion matrix, and 649 errors are in the [recorded-run page](docs/recorded-run/kaggle-agnews-textcnn/README.md).
+This is a bounded recorded run, not a general benchmark. Its config, epoch metrics, environment, confusion matrix, and aggregate test metrics are in the [recorded-run page](docs/recorded-run/kaggle-agnews-textcnn/README.md). Detailed error text is not committed and remains available from Kaggle output.
 
 ## Start from a fresh clone
 

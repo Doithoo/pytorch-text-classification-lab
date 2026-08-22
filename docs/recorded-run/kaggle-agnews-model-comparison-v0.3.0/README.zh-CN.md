@@ -33,7 +33,7 @@ train.csv  76a0a2d2f92b286371fe4d4044640910a04a803fdd2538e0f3f29a5c6f6b672e
 test.csv   521465c2428ed7f02f8d6db6ffdd4b5447c1c701962353eb2c40d548c3c85699
 ```
 
-测试错误数量分别为 BiLSTM 638、EmbeddingBag 643、TextCNN 683。逐类别指标、混淆矩阵和错误样本在每个模型目录的 `evaluation/test/` 中；完整配置、逐轮 metrics、tokenizer 和 run metadata 也一并保留。93 MB 级 checkpoint 不提交 Git，可从 Kaggle Kernel 输出下载。
+测试错误数量分别为 BiLSTM 638、EmbeddingBag 643、TextCNN 683；这些数量和逐类别聚合指标已记录，但逐条错误正文不提交仓库。完整配置、逐轮 metrics 和 run metadata 也一并保留；tokenizer 与 checkpoint 可从 Kaggle 输出下载。
 
 ## 解释边界
 

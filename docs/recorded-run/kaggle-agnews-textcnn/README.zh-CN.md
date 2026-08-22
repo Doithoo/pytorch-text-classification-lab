@@ -43,6 +43,6 @@ manifest identity：
 46780f09619b8d57e203a2719b2eec3ec3ea2b2a4039619a0673a1488ebb3447
 ```
 
-仓库保留 `config.yaml`、`tokenizer.json`、`metrics.csv`、`run.json`、测试指标、错误样本和 Kaggle 摘要。93 MB 的 `best.pt`/`last.pt` 从 Kaggle 输出下载，不提交 Git。该结果严格属于上面的旧 revision；当前代码增加了 TextCNN padding mask、配置校验和新元数据，重新运行可能产生不同数字，不应静默替换本记录。
+仓库保留 `config.yaml`、`metrics.csv`、`run.json`、聚合测试指标和 Kaggle 摘要；不提交 tokenizer 或逐条错误正文，避免重复分发派生词表和新闻文本。93 MB 的 `best.pt`/`last.pt` 从 Kaggle 输出下载。
 
 Kaggle Notebook：https://www.kaggle.com/code/yashowhoo/pytorch-text-classification-lab-ag-news-gpu

@@ -33,7 +33,7 @@ train.csv  76a0a2d2f92b286371fe4d4044640910a04a803fdd2538e0f3f29a5c6f6b672e
 test.csv   521465c2428ed7f02f8d6db6ffdd4b5447c1c701962353eb2c40d548c3c85699
 ```
 
-Test error counts are 638 for BiLSTM, 643 for EmbeddingBag, and 683 for TextCNN. Per-class metrics, confusion matrices, and errors are under each model's `evaluation/test/`; configs, epoch metrics, tokenizer, and run metadata are retained too. The 93 MB-scale checkpoints remain downloadable from Kaggle rather than Git.
+Test error counts are 638 for BiLSTM, 643 for EmbeddingBag, and 683 for TextCNN; counts and aggregate per-class metrics are retained, but per-example error text is not committed. Configs, epoch metrics, and run metadata remain; tokenizer and checkpoints are available from Kaggle output.
 
 ## Interpretation boundary
 

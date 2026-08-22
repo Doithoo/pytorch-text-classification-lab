@@ -2,6 +2,12 @@ __pycache__/
 *.py[cod]
 *.pt
 *.safetensors
+*.log
+.coverage
+coverage.xml
+.DS_Store
+.cache/
+site/
 .venv/
 .pytest_cache/
 .mypy_cache/

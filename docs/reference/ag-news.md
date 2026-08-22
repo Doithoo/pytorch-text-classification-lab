@@ -17,6 +17,6 @@ Original paper citation:
 
 The data originates from AG's corpus of news articles. Terms for the mirror and source data are not the same as this project's MIT source-code license. Before using, publishing, or redistributing raw text, derived vocabulary, or error samples, verify upstream terms, applicable law, and organizational policy.
 
-The repository does not commit raw train/test CSV or checkpoints, but the recorded run retains a derived tokenizer and errors containing test text for auditability. If text redistribution is not permitted by policy, publish aggregate metrics, sample IDs, and hashes only and remove text bodies.
+The repository does not commit raw train/test CSV, checkpoints, full tokenizer files, or per-example errors. Recorded runs retain aggregate evidence; if organization policy permits, detailed error text and tokenizer can be obtained from Kaggle output. Before publishing derived vocabulary or source text, verify upstream terms and privacy.
 
 Fixed URLs and SHA-256 detect upstream byte changes. A checksum proves byte identity; it does not grant usage rights.

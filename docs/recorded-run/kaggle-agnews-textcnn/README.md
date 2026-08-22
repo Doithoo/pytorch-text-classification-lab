@@ -43,6 +43,6 @@ Manifest identity:
 46780f09619b8d57e203a2719b2eec3ec3ea2b2a4039619a0673a1488ebb3447
 ```
 
-The repository retains `config.yaml`, `tokenizer.json`, `metrics.csv`, `run.json`, test metrics, errors, and Kaggle summary. The 93 MB `best.pt` and `last.pt` remain in Kaggle output. This result belongs strictly to the revision above. Current code adds TextCNN padding masks, config validation, and metadata; a rerun may differ and must not silently replace this record.
+The repository retains `config.yaml`, `metrics.csv`, `run.json`, aggregate test metrics, and Kaggle summary. It does not commit the tokenizer or per-example error text, avoiding duplicate distribution of derived vocabulary and news text. The 93 MB `best.pt` and `last.pt` remain downloadable from Kaggle. This result belongs strictly to the revision above; current code may produce different values and must not silently replace it.
 
 Kaggle notebook: https://www.kaggle.com/code/yashowhoo/pytorch-text-classification-lab-ag-news-gpu

@@ -30,7 +30,7 @@ download -> prepare -> inspect -> dry run -> train -> evaluate -> predict
 
 ![AG News TextCNN 测试集混淆矩阵](docs/assets/ag-news-textcnn-confusion.png)
 
-这是一组有明确数据、配置和环境边界的真实运行记录，不是通用基准。配置、tokenizer、逐轮指标、环境、混淆矩阵和 649 个错误样本见[参考运行](docs/recorded-run/kaggle-agnews-textcnn/README.zh-CN.md)。
+这是一组有明确数据、配置和环境边界的真实运行记录，不是通用基准。配置、逐轮指标、环境、混淆矩阵和聚合测试指标见[参考运行](docs/recorded-run/kaggle-agnews-textcnn/README.zh-CN.md)。逐条错误正文不提交仓库，可从对应 Kaggle 输出获取。
 
 ## 从全新克隆开始
 

@@ -15,4 +15,4 @@ This directory contains reproducible Kaggle runners, Kernel metadata, and machin
 
 `kaggle/` is the single-model runner and `kaggle-comparison/` is the current three-model runner. The latter completed a real T4 run at revision `0b350f2`; future experiments should use new versioned directories and never replace historical evidence.
 
-Every complete run should retain exact git revision, source and manifest identity, tokenizer, resolved config, epoch metrics, GPU/PyTorch/CUDA/Python, test metrics, errors, and summary. Select with validation only, then evaluate test once.
+Every complete run should retain exact git revision, source and manifest identity, resolved config, epoch metrics, GPU/PyTorch/CUDA/Python, aggregate test metrics, and summary. Per-example error text and tokenizer can remain in local/Kaggle output instead of Git. Select with validation only, then evaluate test once.

@@ -15,4 +15,4 @@
 
 `kaggle/` 是单模型 runner，`kaggle-comparison/` 是当前代码的三模型 runner。后者已经在 revision `0b350f2` 完成一次真实 T4 运行；再次实验应创建新的版本目录，不覆盖历史证据。
 
-每个完整运行应保留精确 git revision、源与 manifest identity、tokenizer、最终配置、逐轮 metrics、GPU/PyTorch/CUDA/Python、测试指标、错误样本和运行摘要。训练选择只使用验证集，测试集在选择完成后评估一次。
+每个完整运行应保留精确 git revision、源与 manifest identity、最终配置、逐轮 metrics、GPU/PyTorch/CUDA/Python、聚合测试指标和运行摘要。逐条错误正文与 tokenizer 可作为本地/Kaggle 输出，不默认提交 Git。训练选择只使用验证集，测试集在选择完成后评估一次。
